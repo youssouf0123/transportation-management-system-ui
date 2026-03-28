@@ -1,0 +1,33 @@
+<ion-content [fullscreen]="true">
+  <div class="auth-shell">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ i18n.t('create_organization') }}</ion-card-title>
+        <ion-card-subtitle>{{ i18n.t('set_up_shared_workspace') }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content class="stack">
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('organization_name') }}</ion-label>
+          <ion-input [(ngModel)]="organizationName"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('full_name') }}</ion-label>
+          <ion-input [(ngModel)]="fullName"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('email') }}</ion-label>
+          <ion-input [(ngModel)]="email"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('password') }}</ion-label>
+          <ion-input type="password" [(ngModel)]="password"></ion-input>
+        </ion-item>
+        @if (error) {
+          <ion-text color="danger"><p>{{ error }}</p></ion-text>
+        }
+        <ion-button expand="block" (click)="register()">{{ i18n.t('create_workspace') }}</ion-button>
+        <ion-button expand="block" fill="outline" routerLink="/login">{{ i18n.t('back_to_sign_in') }}</ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

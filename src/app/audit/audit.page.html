@@ -1,0 +1,59 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ i18n.t('audit_log_title') }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page-shell">
+    <ion-card>
+      <ion-card-header><ion-card-title>{{ i18n.t('audit_filters') }}</ion-card-title></ion-card-header>
+      <ion-card-content class="filter-grid">
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('entity') }}</ion-label>
+          <ion-select [(ngModel)]="filters.entityType">
+            <ion-select-option value="">{{ i18n.t('all') }}</ion-select-option>
+            <ion-select-option value="DRIVER">{{ i18n.enum('entity', 'DRIVER') }}</ion-select-option>
+            <ion-select-option value="VEHICLE">{{ i18n.enum('entity', 'VEHICLE') }}</ion-select-option>
+            <ion-select-option value="TRIP">{{ i18n.enum('entity', 'TRIP') }}</ion-select-option>
+            <ion-select-option value="FINANCE">{{ i18n.enum('entity', 'FINANCE') }}</ion-select-option>
+            <ion-select-option value="MAINTENANCE">{{ i18n.enum('entity', 'MAINTENANCE') }}</ion-select-option>
+            <ion-select-option value="DOCUMENT">{{ i18n.enum('entity', 'DOCUMENT') }}</ion-select-option>
+            <ion-select-option value="USER">{{ i18n.enum('entity', 'USER') }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('action') }}</ion-label>
+          <ion-select [(ngModel)]="filters.action">
+            <ion-select-option value="">{{ i18n.t('all') }}</ion-select-option>
+            <ion-select-option value="CREATE">{{ i18n.enum('action', 'CREATE') }}</ion-select-option>
+            <ion-select-option value="UPDATE">{{ i18n.enum('action', 'UPDATE') }}</ion-select-option>
+            <ion-select-option value="DELETE">{{ i18n.enum('action', 'DELETE') }}</ion-select-option>
+            <ion-select-option value="ASSIGN">{{ i18n.enum('action', 'ASSIGN') }}</ion-select-option>
+            <ion-select-option value="UPDATE_ROLE">{{ i18n.enum('action', 'UPDATE_ROLE') }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-button expand="block" (click)="load()">{{ i18n.t('apply_filters') }}</ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header><ion-card-title>{{ i18n.t('workspace_activity') }}</ion-card-title></ion-card-header>
+      <ion-card-content class="stack">
+        @if (error) {
+          <ion-text color="danger"><p>{{ error }}</p></ion-text>
+        }
+        @for (log of logs; track $index) {
+          <section class="record-card">
+            <h2>{{ i18n.enum('entity', log.entityType) }} • {{ i18n.enum('action', log.action) }}</h2>
+            <p>{{ log.description }}</p>
+            <p>{{ log.actorName }} ({{ i18n.enum('role', log.actorRole) }}) • {{ log.createdAt }}</p>
+          </section>
+        }
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

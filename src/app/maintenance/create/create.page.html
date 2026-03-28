@@ -1,0 +1,64 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ i18n.t('schedule_service_title') }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page-shell">
+    <ion-item>
+      <ion-label position="stacked">{{ i18n.t('service_type') }}</ion-label>
+      <ion-input [(ngModel)]="record.serviceType"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">{{ i18n.t('status') }}</ion-label>
+      <ion-select [(ngModel)]="record.status">
+        <ion-select-option value="SCHEDULED">{{ i18n.enum('status', 'SCHEDULED') }}</ion-select-option>
+        <ion-select-option value="COMPLETED">{{ i18n.enum('status', 'COMPLETED') }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <app-date-input [label]="i18n.t('service_date')" [(value)]="record.serviceDate"></app-date-input>
+    <ion-item>
+      <ion-label position="stacked">{{ i18n.t('current_mileage') }}</ion-label>
+      <ion-input type="number" [(ngModel)]="record.mileage"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">{{ i18n.t('cost_label') }}</ion-label>
+      <ion-input type="number" [(ngModel)]="record.cost"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">{{ i18n.t('entity_driver') }}</ion-label>
+      <ion-select [(ngModel)]="driverId" (ngModelChange)="onDriverChange()">
+        @for (driver of drivers; track $index) {
+          <ion-select-option [value]="driver.id">{{ driver.name }}</ion-select-option>
+        }
+      </ion-select>
+    </ion-item>
+
+    @if (driverId) {
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>{{ i18n.t('assigned_vehicle') }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          @if (selectedVehicle) {
+            <p><strong>{{ i18n.t('plate_number') }}:</strong> {{ selectedVehicle.plateNumber }}</p>
+            <p><strong>{{ i18n.t('entity_vehicle') }}:</strong> {{ selectedVehicle.make }} {{ selectedVehicle.model }}</p>
+            <p><strong>{{ i18n.t('status') }}:</strong> {{ i18n.enum('status', selectedVehicle.status, 'ACTIVE') }}</p>
+            <p><strong>{{ i18n.t('current_mileage') }}:</strong> {{ selectedVehicle.currentMileage || 0 }}</p>
+          } @else {
+            <p>{{ i18n.t('no_vehicle_assigned_driver') }}</p>
+          }
+        </ion-card-content>
+      </ion-card>
+    }
+
+    @if (error) {
+      <ion-text color="danger"><p>{{ error }}</p></ion-text>
+    }
+    <ion-button expand="block" (click)="save()">{{ i18n.t('save_maintenance_record') }}</ion-button>
+  </div>
+</ion-content>

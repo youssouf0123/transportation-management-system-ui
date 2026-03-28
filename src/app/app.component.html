@@ -1,3 +1,104 @@
 <ion-app>
-  <ion-router-outlet></ion-router-outlet>
+  <ion-split-pane contentId="main-content" when="lg">
+    <ion-menu contentId="main-content" type="overlay">
+      <ion-content>
+        <section class="brand-block">
+          <div class="menu-topbar">
+            <span class="menu-tag">{{ i18n.t('navigation') }}</span>
+            <ion-button fill="clear" class="close-menu-button" (click)="closeMenu()">
+              <ion-icon slot="icon-only" name="close"></ion-icon>
+            </ion-button>
+          </div>
+          <p class="eyebrow">{{ i18n.t('enterprise_workspace') }}</p>
+          <h1>{{ i18n.t('tms_console') }}</h1>
+          <p class="support-copy">
+            @if (authService.getCurrentUser()) {
+              {{ authService.getCurrentUser()?.organizationName }} {{ i18n.t('shared_workspace') }}
+            } @else {
+              {{ i18n.t('manage_workspace') }}
+            }
+          </p>
+          @if (authService.isAuthenticated()) {
+            <div class="menu-search">
+              <ion-item lines="none">
+                <ion-input [(ngModel)]="searchQuery" [placeholder]="i18n.t('search_placeholder')"></ion-input>
+              </ion-item>
+              <ion-button size="small" (click)="goToSearch()">{{ i18n.t('search') }}</ion-button>
+            </div>
+          }
+        </section>
+
+        @if (authService.isAuthenticated()) {
+          <ion-accordion-group class="nav-accordion" [multiple]="true" value="overview">
+            @for (section of filteredNavSections; track section.value) {
+              <ion-accordion [value]="section.value">
+                <ion-item slot="header" lines="none" class="accordion-header">
+                  <ion-label>{{ i18n.t(section.titleKey) }}</ion-label>
+                </ion-item>
+
+                <div slot="content" class="accordion-content">
+                  <ion-list lines="none" class="nav-list">
+                    @for (item of section.items; track item.url) {
+                      <ion-menu-toggle auto-hide="false">
+                        <ion-item
+                          routerDirection="root"
+                          [routerLink]="item.url"
+                          lines="none"
+                          detail="false"
+                          routerLinkActive="selected"
+                        >
+                          <ion-icon
+                            slot="start"
+                            [ios]="item.icon + '-outline'"
+                            [md]="item.icon + '-sharp'"
+                          ></ion-icon>
+                          <ion-label>{{ i18n.t(item.titleKey) }}</ion-label>
+                        </ion-item>
+                      </ion-menu-toggle>
+                    }
+                  </ion-list>
+                </div>
+              </ion-accordion>
+            }
+          </ion-accordion-group>
+
+          <section class="menu-footer">
+            <div class="theme-toggle-row">
+              <ion-label>{{ i18n.t('dark_mode') }}</ion-label>
+              <ion-toggle [checked]="isDarkMode" (ionChange)="toggleTheme()"></ion-toggle>
+            </div>
+            <div class="theme-toggle-row">
+              <ion-label>{{ i18n.t('language') }}</ion-label>
+              <ion-select [value]="i18n.currentLanguage" interface="popover" (ionChange)="setLanguage($event.detail.value)">
+                <ion-select-option value="en">{{ i18n.t('english') }}</ion-select-option>
+                <ion-select-option value="fr">{{ i18n.t('french') }}</ion-select-option>
+              </ion-select>
+            </div>
+            <ion-chip color="success">{{ authService.getCurrentUser()?.role }}</ion-chip>
+            <p>{{ authService.getCurrentUser()?.fullName }}</p>
+            <ion-button expand="block" fill="outline" (click)="logout()">{{ i18n.t('logout') }}</ion-button>
+          </section>
+        } @else {
+          <section class="menu-footer">
+            <div class="theme-toggle-row">
+              <ion-label>{{ i18n.t('dark_mode') }}</ion-label>
+              <ion-toggle [checked]="isDarkMode" (ionChange)="toggleTheme()"></ion-toggle>
+            </div>
+            <div class="theme-toggle-row">
+              <ion-label>{{ i18n.t('language') }}</ion-label>
+              <ion-select [value]="i18n.currentLanguage" interface="popover" (ionChange)="setLanguage($event.detail.value)">
+                <ion-select-option value="en">{{ i18n.t('english') }}</ion-select-option>
+                <ion-select-option value="fr">{{ i18n.t('french') }}</ion-select-option>
+              </ion-select>
+            </div>
+            <ion-button expand="block" routerLink="/login">{{ i18n.t('sign_in') }}</ion-button>
+            <ion-button expand="block" fill="outline" routerLink="/register">{{ i18n.t('create_workspace') }}</ion-button>
+          </section>
+        }
+      </ion-content>
+    </ion-menu>
+
+    <ion-router-outlet id="main-content"></ion-router-outlet>
+  </ion-split-pane>
+
 </ion-app>

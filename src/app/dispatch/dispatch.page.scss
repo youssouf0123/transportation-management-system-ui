@@ -1,0 +1,42 @@
+.kpi-grid,
+.board-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.kpi-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.board-grid {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  margin-top: 18px;
+}
+
+ion-card-content strong {
+  display: block;
+  font-size: 1.8rem;
+}
+
+ion-card-content span {
+  color: var(--ion-color-medium);
+}
+
+.compact-card p,
+.record-card p {
+  margin: 6px 0 0;
+}
+
+.alert-card {
+  border-left: 4px solid #d47a00;
+}
+
+:global(body.dark) {
+  ion-card-content span {
+    color: #b8cbc4;
+  }
+
+  .alert-card {
+    border-left-color: #f0c24f;
+  }
+}

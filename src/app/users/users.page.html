@@ -1,0 +1,60 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ i18n.t('team_roles_title') }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page-shell">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ i18n.t('add_team_member') }}</ion-card-title>
+        <ion-card-subtitle>{{ authService.getCurrentUser()?.organizationName }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content class="stack">
+        <ion-item><ion-label position="stacked">{{ i18n.t('full_name') }}</ion-label><ion-input [(ngModel)]="draft.fullName"></ion-input></ion-item>
+        <ion-item><ion-label position="stacked">{{ i18n.t('email') }}</ion-label><ion-input [(ngModel)]="draft.email"></ion-input></ion-item>
+        <ion-item><ion-label position="stacked">{{ i18n.t('password') }}</ion-label><ion-input type="password" [(ngModel)]="draft.password"></ion-input></ion-item>
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('role') }}</ion-label>
+          <ion-select [(ngModel)]="draft.role">
+            <ion-select-option value="OWNER">{{ i18n.enum('role', 'OWNER') }}</ion-select-option>
+            <ion-select-option value="MANAGER">{{ i18n.enum('role', 'MANAGER') }}</ion-select-option>
+            <ion-select-option value="DISPATCHER">{{ i18n.enum('role', 'DISPATCHER') }}</ion-select-option>
+            <ion-select-option value="FINANCE">{{ i18n.enum('role', 'FINANCE') }}</ion-select-option>
+            <ion-select-option value="VIEWER">{{ i18n.enum('role', 'VIEWER') }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        @if (error) {
+          <ion-text color="danger"><p>{{ error }}</p></ion-text>
+        }
+        <ion-button expand="block" (click)="createUser()">{{ i18n.t('add_user') }}</ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header><ion-card-title>{{ i18n.t('workspace_users') }}</ion-card-title></ion-card-header>
+      <ion-card-content class="stack">
+        @for (user of users; track $index) {
+          <section class="record-card">
+            <h2>{{ user.fullName }}</h2>
+            <p>{{ user.email }}</p>
+            <ion-item>
+              <ion-label position="stacked">{{ i18n.t('role') }}</ion-label>
+              <ion-select [ngModel]="user.role" (ngModelChange)="updateRole(user, $event)">
+                <ion-select-option value="OWNER">{{ i18n.enum('role', 'OWNER') }}</ion-select-option>
+                <ion-select-option value="MANAGER">{{ i18n.enum('role', 'MANAGER') }}</ion-select-option>
+                <ion-select-option value="DISPATCHER">{{ i18n.enum('role', 'DISPATCHER') }}</ion-select-option>
+                <ion-select-option value="FINANCE">{{ i18n.enum('role', 'FINANCE') }}</ion-select-option>
+                <ion-select-option value="VIEWER">{{ i18n.enum('role', 'VIEWER') }}</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </section>
+        }
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

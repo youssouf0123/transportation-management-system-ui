@@ -1,7 +1,10 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
     <ion-title>
-      Blank
+      {{ i18n.t('tms_dashboard') }}
     </ion-title>
   </ion-toolbar>
 </ion-header>
@@ -9,12 +12,119 @@
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
+      <ion-title size="large">{{ i18n.t('tms_dashboard') }}</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+  <section class="hero">
+    <div>
+      <p class="eyebrow">{{ i18n.t('live_transportation_workspace') }}</p>
+      <h1>{{ i18n.t('operations_command_center') }}</h1>
+      <p class="intro">
+        {{ i18n.t('monitor_transportation') }}
+      </p>
+      <ion-button color="success" routerLink="/dispatch">{{ i18n.t('open_operations_board') }}</ion-button>
+    </div>
+  </section>
+
+  @if (error) {
+    <ion-card class="wide-card">
+      <ion-card-content>{{ error }}</ion-card-content>
+    </ion-card>
+  }
+
+  @if (summary) {
+    <section class="stats-grid">
+      <ion-card><ion-card-content><strong>{{ summary.drivers }}</strong><span>{{ i18n.t('total_drivers') }}</span></ion-card-content></ion-card>
+      <ion-card><ion-card-content><strong>{{ summary.availableDrivers }}</strong><span>{{ i18n.t('available_drivers') }}</span></ion-card-content></ion-card>
+      <ion-card><ion-card-content><strong>{{ summary.vehicles }}</strong><span>{{ i18n.t('total_vehicles') }}</span></ion-card-content></ion-card>
+      <ion-card><ion-card-content><strong>{{ summary.activeTrips }}</strong><span>{{ i18n.t('active_trips') }}</span></ion-card-content></ion-card>
+      <ion-card><ion-card-content><strong>{{ summary.maintenanceDue }}</strong><span>{{ i18n.t('maintenance_due') }}</span></ion-card-content></ion-card>
+      <ion-card><ion-card-content><strong><span class="monthly-net-amount">{{ i18n.formatCurrency(summary.net) }}</span></strong><span>{{ i18n.t('monthly_net') }}</span></ion-card-content></ion-card>
+    </section>
+  }
+
+  <section class="cards-grid">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-subtitle>{{ i18n.t('drivers_management') }}</ion-card-subtitle>
+        <ion-card-title>{{ i18n.t('roster_onboarding') }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        {{ i18n.t('create_drivers_review') }}
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-subtitle>{{ i18n.t('vehicles_management') }}</ion-card-subtitle>
+        <ion-card-title>{{ i18n.t('fleet_assignment_flow') }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        {{ i18n.t('switch_vehicle_inventory') }}
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-subtitle>{{ i18n.t('finance_management') }}</ion-card-subtitle>
+        <ion-card-title>{{ i18n.t('records_reporting') }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        {{ i18n.t('view_finance_records_same_workspace') }}
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-subtitle>{{ i18n.t('trips_management') }}</ion-card-subtitle>
+        <ion-card-title>{{ i18n.t('dispatch_route_planning') }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        {{ i18n.t('create_trips_monitor') }}
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-subtitle>{{ i18n.t('maintenance') }}</ion-card-subtitle>
+        <ion-card-title>{{ i18n.t('vehicle_service_tracking') }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        {{ i18n.t('schedule_maintenance_track') }}
+      </ion-card-content>
+    </ion-card>
+  </section>
+
+  @if (summary) {
+    <section class="detail-grid">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>{{ i18n.t('recent_trips') }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          @for (trip of summary.recentTrips; track $index) {
+            <div class="summary-row">
+              <strong>{{ trip.origin }} to {{ trip.destination }}</strong>
+              <span>{{ trip.scheduledDate }} • {{ trip.status }}</span>
+            </div>
+          }
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>{{ i18n.t('recent_maintenance') }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          @for (record of summary.recentMaintenance; track $index) {
+            <div class="summary-row">
+              <strong>{{ record.serviceType }}</strong>
+              <span>{{ record.serviceDate }} • {{ record.status }}</span>
+            </div>
+          }
+        </ion-card-content>
+      </ion-card>
+    </section>
+  }
 </ion-content>

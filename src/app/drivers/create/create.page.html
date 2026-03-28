@@ -1,0 +1,46 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ i18n.t('create_driver_title') }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page-shell">
+    <ion-item>
+      <ion-label position="stacked">{{ i18n.t('name') }}</ion-label>
+      <ion-input [(ngModel)]="driver.name"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">{{ i18n.t('license_number') }}</ion-label>
+      <ion-input [(ngModel)]="driver.licenseNumber"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">{{ i18n.t('phone_number') }}</ion-label>
+      <ion-input [(ngModel)]="driver.phoneNumber"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">{{ i18n.t('status') }}</ion-label>
+      <ion-select [(ngModel)]="driver.status">
+        <ion-select-option value="AVAILABLE">{{ i18n.enum('status', 'AVAILABLE') }}</ion-select-option>
+        <ion-select-option value="ON_TRIP">{{ i18n.enum('status', 'ON_TRIP') }}</ion-select-option>
+        <ion-select-option value="OFF_DUTY">{{ i18n.enum('status', 'OFF_DUTY') }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    @if (error) {
+      <ion-text color="danger">
+        <p>{{ error }}</p>
+      </ion-text>
+    }
+
+    <ion-button expand="block" (click)="save()" [disabled]="saving">
+      {{ saving ? i18n.t('saving') : i18n.t('save_driver') }}
+    </ion-button>
+  </div>
+</ion-content>

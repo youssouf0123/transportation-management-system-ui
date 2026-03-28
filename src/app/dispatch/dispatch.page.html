@@ -1,0 +1,76 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ i18n.t('dispatch_board_title') }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page-shell">
+    @if (error) {
+      <ion-text color="danger"><p>{{ error }}</p></ion-text>
+    }
+
+    @if (board) {
+      <section class="kpi-grid">
+        <ion-card><ion-card-content><strong>{{ board.availableDriverCount }}</strong><span>{{ i18n.t('available_drivers_short') }}</span></ion-card-content></ion-card>
+        <ion-card><ion-card-content><strong>{{ board.availableVehicleCount }}</strong><span>{{ i18n.t('available_vehicles') }}</span></ion-card-content></ion-card>
+        <ion-card><ion-card-content><strong>{{ board.unassignedTripCount }}</strong><span>{{ i18n.t('trips_needing_dispatch') }}</span></ion-card-content></ion-card>
+      </section>
+
+      <section class="board-grid">
+        <ion-card>
+          <ion-card-header><ion-card-title>{{ i18n.t('unassigned_trips') }}</ion-card-title></ion-card-header>
+          <ion-card-content class="stack">
+            @for (trip of board.unassignedTrips; track $index) {
+              <section class="record-card">
+                <strong>{{ trip.origin }} to {{ trip.destination }}</strong>
+                <p>{{ trip.scheduledDate }} • {{ i18n.enum('status', trip.status, 'PLANNED') }}</p>
+                <p>{{ i18n.t('entity_driver') }}: {{ trip.driver?.name || i18n.t('unassigned') }}</p>
+                <p>{{ i18n.t('entity_vehicle') }}: {{ trip.vehicle?.plateNumber || i18n.t('unassigned') }}</p>
+              </section>
+            }
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card>
+          <ion-card-header><ion-card-title>{{ i18n.t('ready_drivers_vehicles') }}</ion-card-title></ion-card-header>
+          <ion-card-content class="stack">
+            @for (driver of board.availableDrivers; track $index) {
+              <section class="record-card compact-card">
+                <strong>{{ driver.name }}</strong>
+                <p>{{ driver.licenseNumber }} • {{ i18n.enum('status', driver.status, 'AVAILABLE') }}</p>
+              </section>
+            }
+            @for (vehicle of board.availableVehicles; track $index) {
+              <section class="record-card compact-card">
+                <strong>{{ vehicle.plateNumber }}</strong>
+                <p>{{ vehicle.make }} {{ vehicle.model }} • {{ i18n.enum('status', vehicle.status, 'ACTIVE') }}</p>
+              </section>
+            }
+          </ion-card-content>
+        </ion-card>
+
+        <ion-card>
+          <ion-card-header><ion-card-title>{{ i18n.t('active_trips_maintenance_alerts') }}</ion-card-title></ion-card-header>
+          <ion-card-content class="stack">
+            @for (trip of board.activeTrips; track $index) {
+              <section class="record-card compact-card">
+                <strong>{{ trip.origin }} to {{ trip.destination }}</strong>
+                <p>{{ trip.scheduledDate }} • {{ i18n.enum('status', trip.status, 'PLANNED') }}</p>
+              </section>
+            }
+            @for (record of board.maintenanceAlerts; track $index) {
+              <section class="record-card compact-card alert-card">
+                <strong>{{ record.serviceType }}</strong>
+                <p>{{ record.vehicle?.plateNumber || i18n.t('no_vehicle') }} • {{ record.serviceDate }}</p>
+              </section>
+            }
+          </ion-card-content>
+        </ion-card>
+      </section>
+    }
+  </div>
+</ion-content>

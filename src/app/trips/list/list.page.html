@@ -1,0 +1,117 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ i18n.t('trips_title') }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page-shell">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ i18n.t('trip_filters') }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content class="filter-grid">
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('status') }}</ion-label>
+          <ion-select [(ngModel)]="filters.status">
+            <ion-select-option value="">{{ i18n.t('all') }}</ion-select-option>
+            <ion-select-option value="PLANNED">{{ i18n.enum('status', 'PLANNED') }}</ion-select-option>
+            <ion-select-option value="IN_PROGRESS">{{ i18n.enum('status', 'IN_PROGRESS') }}</ion-select-option>
+            <ion-select-option value="COMPLETED">{{ i18n.enum('status', 'COMPLETED') }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('entity_driver') }}</ion-label>
+          <ion-select [(ngModel)]="filters.driverId">
+            <ion-select-option [value]="null">{{ i18n.t('all') }}</ion-select-option>
+            @for (driver of drivers; track $index) {
+              <ion-select-option [value]="driver.id">{{ driver.name }}</ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('entity_vehicle') }}</ion-label>
+          <ion-select [(ngModel)]="filters.vehicleId">
+            <ion-select-option [value]="null">{{ i18n.t('all') }}</ion-select-option>
+            @for (vehicle of vehicles; track $index) {
+              <ion-select-option [value]="vehicle.id">{{ vehicle.plateNumber }}</ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+        <app-date-input [label]="i18n.t('date')" [(value)]="filters.date"></app-date-input>
+        <ion-button expand="block" (click)="loadTrips()">{{ i18n.t('apply_filters') }}</ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ i18n.t('trip_board') }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content class="stack">
+        @if (error) {
+          <ion-text color="danger"><p>{{ error }}</p></ion-text>
+        }
+
+        @for (trip of trips; track $index) {
+          <section class="record-card">
+            @if (editingId === trip.id && draft) {
+              <div class="filter-grid">
+                <ion-item>
+                  <ion-label position="stacked">{{ i18n.t('origin') }}</ion-label>
+                  <ion-input [(ngModel)]="draft.origin"></ion-input>
+                </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">{{ i18n.t('destination') }}</ion-label>
+                  <ion-input [(ngModel)]="draft.destination"></ion-input>
+                </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">{{ i18n.t('status') }}</ion-label>
+                  <ion-select [(ngModel)]="draft.status">
+                    <ion-select-option value="PLANNED">{{ i18n.enum('status', 'PLANNED') }}</ion-select-option>
+                    <ion-select-option value="IN_PROGRESS">{{ i18n.enum('status', 'IN_PROGRESS') }}</ion-select-option>
+                    <ion-select-option value="COMPLETED">{{ i18n.enum('status', 'COMPLETED') }}</ion-select-option>
+                  </ion-select>
+                </ion-item>
+                <app-date-input [label]="i18n.t('date')" [(value)]="draft.scheduledDate"></app-date-input>
+                <ion-item>
+                  <ion-label position="stacked">{{ i18n.t('entity_driver') }}</ion-label>
+                  <ion-select [(ngModel)]="draft.driver">
+                    <ion-select-option [value]="null">{{ i18n.t('unassigned') }}</ion-select-option>
+                    @for (driver of drivers; track $index) {
+                      <ion-select-option [value]="{ id: driver.id }">{{ driver.name }}</ion-select-option>
+                    }
+                  </ion-select>
+                </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">{{ i18n.t('entity_vehicle') }}</ion-label>
+                  <ion-select [(ngModel)]="draft.vehicle">
+                    <ion-select-option [value]="null">{{ i18n.t('unassigned') }}</ion-select-option>
+                    @for (vehicle of vehicles; track $index) {
+                      <ion-select-option [value]="{ id: vehicle.id }">{{ vehicle.plateNumber }}</ion-select-option>
+                    }
+                  </ion-select>
+                </ion-item>
+              </div>
+              <div class="actions">
+                <ion-button (click)="saveEdit()">{{ i18n.t('save') }}</ion-button>
+                <ion-button fill="outline" (click)="editingId = null; draft = null">{{ i18n.t('cancel') }}</ion-button>
+              </div>
+            } @else {
+              <h2>{{ trip.origin }} to {{ trip.destination }}</h2>
+              <p>{{ trip.scheduledDate }} • {{ i18n.enum('status', trip.status, 'PLANNED') }}</p>
+              <p>{{ i18n.t('entity_driver') }}: {{ trip.driver?.name || i18n.t('unassigned') }}</p>
+              <p>{{ i18n.t('entity_vehicle') }}: {{ trip.vehicle?.plateNumber || i18n.t('unassigned') }}</p>
+              <div class="actions">
+                <ion-button size="small" fill="outline" (click)="startEdit(trip)">{{ i18n.t('edit') }}</ion-button>
+                <ion-button size="small" color="danger" fill="outline" (click)="deleteTrip(trip.id)">{{ i18n.t('delete') }}</ion-button>
+              </div>
+            }
+          </section>
+        }
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

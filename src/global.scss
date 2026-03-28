@@ -34,4 +34,303 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import "@ionic/angular/css/palettes/dark.system.css";
+
+html,
+body,
+ion-app,
+ion-content {
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(57, 124, 212, 0.08), transparent 22%),
+    linear-gradient(180deg, #f4f8f5 0%, #fbfdff 100%);
+  color: var(--ion-text-color);
+}
+
+ion-content {
+  --background: transparent;
+}
+
+ion-toolbar {
+  --background: rgba(255, 255, 255, 0.72);
+  --border-color: transparent;
+  backdrop-filter: blur(12px);
+}
+
+ion-title {
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+ion-card {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(14px);
+}
+
+body.dark {
+  background:
+    radial-gradient(circle at top left, rgba(83, 129, 255, 0.12), transparent 24%),
+    linear-gradient(180deg, #08131b 0%, #0d1921 100%);
+  color: var(--ion-text-color);
+}
+
+body.dark ion-toolbar {
+  --background: rgba(8, 16, 23, 0.84);
+}
+
+body.dark ion-card {
+  background: rgba(15, 24, 32, 0.88);
+  color: #edf6f2;
+}
+
+body.dark ion-item {
+  --background: rgba(15, 24, 32, 0.88);
+  --color: #edf6f2;
+  color: #edf6f2;
+}
+
+body.dark ion-item::part(native) {
+  color: #edf6f2;
+}
+
+body.dark ion-title,
+body.dark h1,
+body.dark h2,
+body.dark h3,
+body.dark p,
+body.dark span,
+body.dark ion-label,
+body.dark ion-card-title,
+body.dark ion-card-subtitle {
+  color: #edf6f2;
+}
+
+body.dark .record-card {
+  background: rgba(19, 31, 40, 0.92);
+  color: #edf6f2;
+  border: 1px solid rgba(137, 171, 162, 0.14);
+}
+
+body.dark .record-card h2,
+body.dark .record-card p,
+body.dark .record-card strong,
+body.dark .record-card span {
+  color: #edf6f2;
+}
+
+body.dark ion-alert {
+  --background: #101a22;
+  --color: #edf6f2;
+  --button-color: var(--ion-color-primary);
+}
+
+body.dark ion-alert .alert-wrapper,
+body.dark ion-alert .alert-head,
+body.dark ion-alert .alert-message,
+body.dark ion-alert .alert-radio-label,
+body.dark ion-alert .alert-checkbox-label,
+body.dark ion-alert .alert-input,
+body.dark ion-alert .alert-button-inner {
+  color: #edf6f2;
+}
+
+body.dark ion-alert .alert-radio-icon,
+body.dark ion-alert .alert-checkbox-icon {
+  border-color: rgba(155, 188, 255, 0.58);
+}
+
+body.dark ion-popover {
+  --background: #101a22;
+  --color: #edf6f2;
+}
+
+body.dark ion-select-popover {
+  --background: #101a22;
+  --color: #edf6f2;
+}
+
+body.dark ion-select-popover ion-item,
+body.dark ion-select-popover .sc-ion-select-popover-md-h,
+body.dark ion-select-popover .sc-ion-select-popover-ios-h {
+  --background: transparent;
+  --color: #edf6f2;
+  color: #edf6f2;
+}
+
+body.dark ion-select-popover ion-label,
+body.dark ion-select-popover ion-radio,
+body.dark ion-select-popover ion-item::part(native) {
+  color: #edf6f2;
+}
+
+body.dark ion-select-popover .select-interface-option.item-radio-checked,
+body.dark ion-select-popover .select-interface-option.item-checkbox-checked {
+  --background: rgba(126, 166, 255, 0.18);
+  --color: #ffffff;
+  background: rgba(126, 166, 255, 0.18);
+  color: #ffffff;
+}
+
+body.dark ion-select-popover .select-interface-option.item-radio-checked ion-label,
+body.dark ion-select-popover .select-interface-option.item-checkbox-checked ion-label,
+body.dark ion-select-popover .select-interface-option.item-radio-checked ion-radio,
+body.dark ion-select-popover .select-interface-option.item-checkbox-checked ion-checkbox {
+  color: #ffffff;
+}
+
+body.dark ion-alert [aria-checked="true"].alert-radio,
+body.dark ion-alert [aria-checked="true"].alert-checkbox {
+  background: rgba(126, 166, 255, 0.18);
+}
+
+body.dark ion-alert [aria-checked="true"] .alert-radio-label,
+body.dark ion-alert [aria-checked="true"] .alert-checkbox-label {
+  color: #ffffff;
+}
+
+body.dark ion-modal {
+  --background: #101a22;
+  --color: #edf6f2;
+}
+
+body.dark ion-modal ion-content,
+body.dark ion-modal ion-datetime {
+  --background: #101a22;
+  --background-rgb: 16, 26, 34;
+  --color: #edf6f2;
+  color: #edf6f2;
+}
+
+body.dark ion-datetime .datetime-header,
+body.dark ion-datetime .datetime-title,
+body.dark ion-datetime .datetime-selected-date,
+body.dark ion-datetime .calendar-days-of-week,
+body.dark ion-datetime .day-of-week,
+body.dark ion-datetime .calendar-body,
+body.dark ion-datetime .calendar-day,
+body.dark ion-datetime .calendar-day-wrapper,
+body.dark ion-datetime .datetime-year,
+body.dark ion-datetime .datetime-time,
+body.dark ion-datetime .time-body,
+body.dark ion-datetime .time-header {
+  color: #edf6f2;
+}
+
+body.dark ion-datetime .calendar-day {
+  color: #edf6f2;
+  background: transparent;
+}
+
+body.dark ion-datetime .calendar-day.calendar-day-adjacent-day,
+body.dark ion-datetime .calendar-day[disabled],
+body.dark ion-datetime .calendar-day.calendar-day-disabled {
+  color: rgba(237, 246, 242, 0.38);
+}
+
+body.dark ion-datetime .calendar-day.calendar-day-today {
+  color: #9bbcff;
+}
+
+body.dark ion-datetime .calendar-day.calendar-day-active,
+body.dark ion-datetime .calendar-day.calendar-day-active:focus,
+body.dark ion-datetime .calendar-day.calendar-day-today.calendar-day-active {
+  background: rgba(126, 166, 255, 0.22);
+  color: #ffffff;
+  border-radius: 999px;
+}
+
+img,
+video,
+canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+.page-shell {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.filter-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.stack {
+  display: grid;
+  gap: 12px;
+}
+
+.record-card {
+  overflow-wrap: anywhere;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.actions ion-button {
+  margin: 0;
+}
+
+ion-segment {
+  width: 100%;
+}
+
+@media (max-width: 767px) {
+  body {
+    font-size: 15px;
+  }
+
+  ion-title {
+    font-size: 1rem;
+  }
+
+  ion-toolbar {
+    --min-height: 56px;
+  }
+
+  ion-card {
+    border-radius: 18px;
+  }
+
+  .page-shell {
+    padding-inline: 0;
+  }
+
+  .filter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .actions ion-button {
+    width: 100%;
+  }
+
+  ion-item {
+    --inner-padding-end: 10px;
+  }
+
+  ion-segment {
+    overflow-x: auto;
+  }
+
+  ion-segment-button {
+    min-width: 150px;
+  }
+}

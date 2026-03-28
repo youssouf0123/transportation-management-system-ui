@@ -1,0 +1,154 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ i18n.t('documents_title') }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page-shell">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ editingId ? i18n.t('update_document') : i18n.t('add_document') }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content class="filter-grid">
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('title') }}</ion-label>
+          <ion-input [(ngModel)]="draft.title"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('document_type') }}</ion-label>
+          <ion-select [(ngModel)]="draft.documentType">
+            <ion-select-option value="LICENSE">{{ i18n.enum('document', 'LICENSE') }}</ion-select-option>
+            <ion-select-option value="INSURANCE">{{ i18n.enum('document', 'INSURANCE') }}</ion-select-option>
+            <ion-select-option value="REGISTRATION">{{ i18n.enum('document', 'REGISTRATION') }}</ion-select-option>
+            <ion-select-option value="CONTRACT">{{ i18n.enum('document', 'CONTRACT') }}</ion-select-option>
+            <ion-select-option value="RECEIPT">{{ i18n.enum('document', 'RECEIPT') }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('entity_type') }}</ion-label>
+          <ion-select [(ngModel)]="draft.entityType">
+            <ion-select-option value="DRIVER">{{ i18n.enum('entity', 'DRIVER') }}</ion-select-option>
+            <ion-select-option value="VEHICLE">{{ i18n.enum('entity', 'VEHICLE') }}</ion-select-option>
+            <ion-select-option value="TRIP">{{ i18n.enum('entity', 'TRIP') }}</ion-select-option>
+            <ion-select-option value="FINANCE">{{ i18n.enum('entity', 'FINANCE') }}</ion-select-option>
+            <ion-select-option value="WORKSPACE">{{ i18n.enum('entity', 'WORKSPACE') }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('entity_id') }}</ion-label>
+          <ion-input type="number" [(ngModel)]="draft.entityId"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('status') }}</ion-label>
+          <ion-select [(ngModel)]="draft.status">
+            <ion-select-option value="ACTIVE">{{ i18n.enum('status', 'ACTIVE') }}</ion-select-option>
+            <ion-select-option value="EXPIRED">{{ i18n.enum('status', 'EXPIRED') }}</ion-select-option>
+            <ion-select-option value="ARCHIVED">{{ i18n.enum('status', 'ARCHIVED') }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <app-date-input [label]="i18n.t('expiry_date')" [(value)]="draft.expiryDate"></app-date-input>
+        <input #filePicker type="file" accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx" style="display: none" (change)="onFileSelected($event)">
+        <div class="actions full-span">
+          <ion-button expand="block" fill="outline" (click)="triggerPicker(filePicker)">{{ i18n.t('choose_file') }}</ion-button>
+          <ion-button expand="block" fill="outline" (click)="openCamera()">{{ i18n.t('use_camera') }}</ion-button>
+        </div>
+        @if (cameraError) {
+          <ion-text class="full-span" color="danger">
+            <p>{{ cameraError }}</p>
+          </ion-text>
+        }
+        @if (cameraOpen) {
+          <div class="camera-panel full-span">
+            <video #cameraVideo autoplay playsinline muted></video>
+            <div class="actions">
+              <ion-button expand="block" (click)="capturePhoto()">{{ i18n.t('capture_photo') }}</ion-button>
+              <ion-button expand="block" fill="outline" (click)="closeCamera()">{{ i18n.t('close_camera') }}</ion-button>
+            </div>
+          </div>
+        }
+        <ion-item class="full-span">
+          <ion-label position="stacked">{{ i18n.t('selected_upload') }}</ion-label>
+          <ion-input [value]="selectedFileName || draft.fileName || i18n.t('no_file_selected')" readonly></ion-input>
+        </ion-item>
+        @if (editingId && draft.fileUrl) {
+          <div class="actions full-span">
+            <ion-button fill="clear" (click)="openDocument(draft)">{{ i18n.t('open_current_file') }}</ion-button>
+          </div>
+        }
+        <ion-item class="full-span">
+          <ion-label position="stacked">{{ i18n.t('notes') }}</ion-label>
+          <ion-textarea [(ngModel)]="draft.notes"></ion-textarea>
+        </ion-item>
+        <ion-button expand="block" (click)="save()">{{ editingId ? i18n.t('update') : i18n.t('save') }}</ion-button>
+        <ion-button expand="block" fill="outline" (click)="resetDraft()">{{ i18n.t('clear') }}</ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header><ion-card-title>{{ i18n.t('filter_documents') }}</ion-card-title></ion-card-header>
+      <ion-card-content class="filter-grid">
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('type') }}</ion-label>
+          <ion-select [(ngModel)]="filters.documentType">
+            <ion-select-option value="">{{ i18n.t('all') }}</ion-select-option>
+            <ion-select-option value="LICENSE">{{ i18n.enum('document', 'LICENSE') }}</ion-select-option>
+            <ion-select-option value="INSURANCE">{{ i18n.enum('document', 'INSURANCE') }}</ion-select-option>
+            <ion-select-option value="REGISTRATION">{{ i18n.enum('document', 'REGISTRATION') }}</ion-select-option>
+            <ion-select-option value="CONTRACT">{{ i18n.enum('document', 'CONTRACT') }}</ion-select-option>
+            <ion-select-option value="RECEIPT">{{ i18n.enum('document', 'RECEIPT') }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('entity') }}</ion-label>
+          <ion-select [(ngModel)]="filters.entityType">
+            <ion-select-option value="">{{ i18n.t('all') }}</ion-select-option>
+            <ion-select-option value="DRIVER">{{ i18n.enum('entity', 'DRIVER') }}</ion-select-option>
+            <ion-select-option value="VEHICLE">{{ i18n.enum('entity', 'VEHICLE') }}</ion-select-option>
+            <ion-select-option value="TRIP">{{ i18n.enum('entity', 'TRIP') }}</ion-select-option>
+            <ion-select-option value="FINANCE">{{ i18n.enum('entity', 'FINANCE') }}</ion-select-option>
+            <ion-select-option value="WORKSPACE">{{ i18n.enum('entity', 'WORKSPACE') }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('status') }}</ion-label>
+          <ion-select [(ngModel)]="filters.status">
+            <ion-select-option value="">{{ i18n.t('all') }}</ion-select-option>
+            <ion-select-option value="ACTIVE">{{ i18n.enum('status', 'ACTIVE') }}</ion-select-option>
+            <ion-select-option value="EXPIRED">{{ i18n.enum('status', 'EXPIRED') }}</ion-select-option>
+            <ion-select-option value="ARCHIVED">{{ i18n.enum('status', 'ARCHIVED') }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <app-date-input [label]="i18n.t('expiry_before')" [(value)]="filters.expiryBefore"></app-date-input>
+        <ion-button expand="block" (click)="load()">{{ i18n.t('apply_filters') }}</ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header><ion-card-title>{{ i18n.t('workspace_documents') }}</ion-card-title></ion-card-header>
+      <ion-card-content class="stack">
+        @if (error) {
+          <ion-text color="danger"><p>{{ error }}</p></ion-text>
+        }
+        @for (document of documents; track $index) {
+          <section class="record-card">
+            <h2>{{ document.title }}</h2>
+            <p>{{ i18n.enum('document', document.documentType) }} • {{ i18n.enum('entity', document.entityType) }} #{{ document.entityId || 'N/A' }}</p>
+            <p>{{ i18n.t('status') }}: {{ i18n.enum('status', document.status, 'ACTIVE') }} • {{ i18n.t('expiry_date') }}: {{ document.expiryDate || i18n.t('none') }}</p>
+            <p>{{ document.fileName || i18n.t('uploaded_file') }}</p>
+            <div class="actions">
+              @if (document.fileUrl) {
+                <ion-button size="small" fill="clear" (click)="openDocument(document)">{{ i18n.t('open_file') }}</ion-button>
+              }
+              <ion-button size="small" fill="outline" (click)="startEdit(document)">{{ i18n.t('edit') }}</ion-button>
+              <ion-button size="small" color="danger" fill="outline" (click)="deleteDocument(document.id)">{{ i18n.t('delete') }}</ion-button>
+            </div>
+          </section>
+        }
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

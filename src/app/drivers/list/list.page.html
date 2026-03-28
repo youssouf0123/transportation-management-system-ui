@@ -1,0 +1,92 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ i18n.t('drivers_title') }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="loadDrivers($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="page-shell">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ i18n.t('search_drivers') }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content class="filter-grid">
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('search_label') }}</ion-label>
+          <ion-input [(ngModel)]="filters.search" [placeholder]="i18n.t('search_drivers_placeholder')"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('status') }}</ion-label>
+          <ion-select [(ngModel)]="filters.status">
+            <ion-select-option value="">{{ i18n.t('all') }}</ion-select-option>
+            <ion-select-option value="AVAILABLE">{{ i18n.enum('status', 'AVAILABLE') }}</ion-select-option>
+            <ion-select-option value="ON_TRIP">{{ i18n.enum('status', 'ON_TRIP') }}</ion-select-option>
+            <ion-select-option value="OFF_DUTY">{{ i18n.enum('status', 'OFF_DUTY') }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-button expand="block" (click)="loadDrivers()">{{ i18n.t('apply_filters') }}</ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ i18n.t('driver_roster') }}</ion-card-title>
+        <ion-card-subtitle>{{ drivers.length }} {{ i18n.t('total_results') }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content class="stack">
+        @if (error) {
+          <ion-text color="danger"><p>{{ error }}</p></ion-text>
+        }
+
+        @for (driver of drivers; track $index) {
+          <section class="record-card">
+            @if (editingId === driver.id && draft) {
+              <div class="filter-grid">
+                <ion-item>
+                  <ion-label position="stacked">{{ i18n.t('name') }}</ion-label>
+                  <ion-input [(ngModel)]="draft.name"></ion-input>
+                </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">{{ i18n.t('license_number') }}</ion-label>
+                  <ion-input [(ngModel)]="draft.licenseNumber"></ion-input>
+                </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">{{ i18n.t('phone_number') }}</ion-label>
+                  <ion-input [(ngModel)]="draft.phoneNumber"></ion-input>
+                </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">{{ i18n.t('status') }}</ion-label>
+                  <ion-select [(ngModel)]="draft.status">
+                    <ion-select-option value="AVAILABLE">{{ i18n.enum('status', 'AVAILABLE') }}</ion-select-option>
+                    <ion-select-option value="ON_TRIP">{{ i18n.enum('status', 'ON_TRIP') }}</ion-select-option>
+                    <ion-select-option value="OFF_DUTY">{{ i18n.enum('status', 'OFF_DUTY') }}</ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </div>
+              <div class="actions">
+                <ion-button (click)="saveEdit()">{{ i18n.t('save') }}</ion-button>
+                <ion-button fill="outline" (click)="editingId = null; draft = null">{{ i18n.t('cancel') }}</ion-button>
+              </div>
+            } @else {
+              <h2>{{ driver.name }}</h2>
+              <p>{{ driver.licenseNumber }}</p>
+              <p>{{ driver.phoneNumber || i18n.t('no_phone_number') }}</p>
+              <ion-chip>{{ i18n.enum('status', driver.status, 'AVAILABLE') }}</ion-chip>
+              <div class="actions">
+                <ion-button size="small" fill="outline" (click)="startEdit(driver)">{{ i18n.t('edit') }}</ion-button>
+                <ion-button size="small" color="danger" fill="outline" (click)="deleteDriver(driver.id)">{{ i18n.t('delete') }}</ion-button>
+              </div>
+            }
+          </section>
+        }
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

@@ -1,0 +1,17 @@
+.full-span {
+  grid-column: 1 / -1;
+}
+
+.camera-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.camera-panel video {
+  width: 100%;
+  min-height: 240px;
+  max-height: 420px;
+  border-radius: 18px;
+  background: #0f1720;
+  object-fit: cover;
+}

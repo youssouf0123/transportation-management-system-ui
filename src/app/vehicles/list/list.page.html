@@ -1,0 +1,113 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ i18n.t('vehicles_title') }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="loadVehicles($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="page-shell">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ i18n.t('vehicle_filters') }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content class="filter-grid">
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('search_label') }}</ion-label>
+          <ion-input [(ngModel)]="filters.search" [placeholder]="i18n.t('vehicle_filters_placeholder')"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('status') }}</ion-label>
+          <ion-select [(ngModel)]="filters.status">
+            <ion-select-option value="">{{ i18n.t('all') }}</ion-select-option>
+            <ion-select-option value="ACTIVE">{{ i18n.enum('status', 'ACTIVE') }}</ion-select-option>
+            <ion-select-option value="IN_SERVICE">{{ i18n.enum('status', 'IN_SERVICE') }}</ion-select-option>
+            <ion-select-option value="OUT_OF_SERVICE">{{ i18n.enum('status', 'OUT_OF_SERVICE') }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('assigned_driver') }}</ion-label>
+          <ion-select [(ngModel)]="filters.driverId">
+            <ion-select-option [value]="null">{{ i18n.t('all') }}</ion-select-option>
+            @for (driver of drivers; track $index) {
+              <ion-select-option [value]="driver.id">{{ driver.name }}</ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+        <ion-button expand="block" (click)="loadVehicles()">{{ i18n.t('apply_filters') }}</ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ i18n.t('fleet_registry') }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content class="stack">
+        @if (error) {
+          <ion-text color="danger"><p>{{ error }}</p></ion-text>
+        }
+
+        @for (vehicle of vehicles; track $index) {
+          <section class="record-card">
+            @if (editingId === vehicle.id && draft) {
+              <div class="filter-grid">
+                <ion-item>
+                  <ion-label position="stacked">{{ i18n.t('make') }}</ion-label>
+                  <ion-input [(ngModel)]="draft.make"></ion-input>
+                </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">{{ i18n.t('model') }}</ion-label>
+                  <ion-input [(ngModel)]="draft.model"></ion-input>
+                </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">{{ i18n.t('plate_number') }}</ion-label>
+                  <ion-input [(ngModel)]="draft.plateNumber"></ion-input>
+                </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">{{ i18n.t('status') }}</ion-label>
+                  <ion-select [(ngModel)]="draft.status">
+                    <ion-select-option value="ACTIVE">{{ i18n.enum('status', 'ACTIVE') }}</ion-select-option>
+                    <ion-select-option value="IN_SERVICE">{{ i18n.enum('status', 'IN_SERVICE') }}</ion-select-option>
+                    <ion-select-option value="OUT_OF_SERVICE">{{ i18n.enum('status', 'OUT_OF_SERVICE') }}</ion-select-option>
+                  </ion-select>
+                </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">{{ i18n.t('current_mileage') }}</ion-label>
+                  <ion-input type="number" [(ngModel)]="draft.currentMileage"></ion-input>
+                </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">{{ i18n.t('entity_driver') }}</ion-label>
+                  <ion-select [(ngModel)]="draft.driver" [compareWith]="compareById">
+                    <ion-select-option [value]="null">{{ i18n.t('unassigned') }}</ion-select-option>
+                    @for (driver of drivers; track $index) {
+                      <ion-select-option [value]="{ id: driver.id }">{{ driver.name }}</ion-select-option>
+                    }
+                  </ion-select>
+                </ion-item>
+              </div>
+              <div class="actions">
+                <ion-button (click)="saveEdit()">{{ i18n.t('save') }}</ion-button>
+                <ion-button fill="outline" (click)="editingId = null; draft = null">{{ i18n.t('cancel') }}</ion-button>
+              </div>
+            } @else {
+              <h2>{{ vehicle.make }} {{ vehicle.model }}</h2>
+              <p>{{ vehicle.plateNumber }} • {{ i18n.enum('status', vehicle.status, 'ACTIVE') }}</p>
+              <p>{{ i18n.t('entity_driver') }}: {{ vehicle.driver?.name || i18n.t('unassigned') }}</p>
+              <p>{{ i18n.t('current_mileage') }}: {{ vehicle.currentMileage || 0 }}</p>
+              <div class="actions">
+                <ion-button size="small" fill="outline" (click)="startEdit(vehicle)">{{ i18n.t('edit') }}</ion-button>
+                <ion-button size="small" color="danger" fill="outline" (click)="deleteVehicle(vehicle.id)">{{ i18n.t('delete') }}</ion-button>
+              </div>
+            }
+          </section>
+        }
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

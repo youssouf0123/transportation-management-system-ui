@@ -1,0 +1,51 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ i18n.t('create_vehicle_title') }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page-shell">
+    <ion-item>
+      <ion-label position="stacked">{{ i18n.t('make') }}</ion-label>
+      <ion-input [(ngModel)]="vehicle.make"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">{{ i18n.t('model') }}</ion-label>
+      <ion-input [(ngModel)]="vehicle.model"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">{{ i18n.t('plate_number') }}</ion-label>
+      <ion-input [(ngModel)]="vehicle.plateNumber"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">{{ i18n.t('status') }}</ion-label>
+      <ion-select [(ngModel)]="vehicle.status">
+        <ion-select-option value="ACTIVE">{{ i18n.enum('status', 'ACTIVE') }}</ion-select-option>
+        <ion-select-option value="IN_SERVICE">{{ i18n.enum('status', 'IN_SERVICE') }}</ion-select-option>
+        <ion-select-option value="OUT_OF_SERVICE">{{ i18n.enum('status', 'OUT_OF_SERVICE') }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">{{ i18n.t('current_mileage') }}</ion-label>
+      <ion-input type="number" [(ngModel)]="vehicle.currentMileage"></ion-input>
+    </ion-item>
+
+    @if (error) {
+      <ion-text color="danger">
+        <p>{{ error }}</p>
+      </ion-text>
+    }
+
+    <ion-button expand="block" (click)="save()" [disabled]="saving">
+      {{ saving ? i18n.t('saving') : i18n.t('save_vehicle') }}
+    </ion-button>
+  </div>
+</ion-content>

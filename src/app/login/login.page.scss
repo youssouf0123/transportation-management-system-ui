@@ -1,0 +1,15 @@
+.auth-shell {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+ion-card {
+  width: min(100%, 460px);
+}
+
+.stack {
+  display: grid;
+  gap: 12px;
+}

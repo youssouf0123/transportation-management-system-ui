@@ -1,0 +1,33 @@
+.page-shell {
+  padding: 16px;
+  display: grid;
+  gap: 16px;
+}
+
+.filter-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.stack {
+  display: grid;
+  gap: 12px;
+}
+
+.record-card {
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(246, 250, 255, 0.9);
+}
+
+.record-card h2,
+.record-card p {
+  margin: 0 0 8px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}

@@ -1,0 +1,70 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ i18n.t('search_page_title') }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page-shell">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ i18n.t('global_search') }}</ion-card-title>
+        <ion-card-subtitle>{{ i18n.t('search_across_records') }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content class="filter-grid">
+        <ion-item class="full-span">
+          <ion-label position="stacked">{{ i18n.t('search_term') }}</ion-label>
+          <ion-input [(ngModel)]="query" [placeholder]="i18n.t('search_term_placeholder')"></ion-input>
+        </ion-item>
+        <ion-button expand="block" (click)="runSearch()">{{ i18n.t('search') }}</ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    @if (error) {
+      <ion-text color="danger"><p>{{ error }}</p></ion-text>
+    }
+
+    @if (query && !searching) {
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>{{ results.totalResults }} {{ i18n.t('results_for') }} "{{ results.query }}"</ion-card-title>
+        </ion-card-header>
+      </ion-card>
+    }
+
+    @if (searching) {
+      <ion-card>
+        <ion-card-content>{{ i18n.t('searching_workspace_records') }}</ion-card-content>
+      </ion-card>
+    }
+
+    @if (query && !searching && !results.sections.length) {
+      <ion-card>
+        <ion-card-content>{{ i18n.t('no_results_found') }}</ion-card-content>
+      </ion-card>
+    }
+
+    @for (section of results.sections; track section.key) {
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>{{ section.title }}</ion-card-title>
+          <ion-card-subtitle>{{ section.results.length }} {{ i18n.t('matches') }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content class="stack">
+          @for (item of section.results; track item.type + '-' + item.id) {
+            <section class="record-card">
+              <h2>{{ item.title }}</h2>
+              <p>{{ item.subtitle }}</p>
+              <div class="actions">
+                <ion-button size="small" fill="outline" [routerLink]="item.route">{{ i18n.t('open_module') }}</ion-button>
+              </div>
+            </section>
+          }
+        </ion-card-content>
+      </ion-card>
+    }
+  </div>
+</ion-content>

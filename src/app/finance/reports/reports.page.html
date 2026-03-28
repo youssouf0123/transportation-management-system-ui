@@ -1,0 +1,43 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ i18n.t('finance_reports_title') }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page-shell">
+    <app-date-input [label]="i18n.t('start_date')" [(value)]="start"></app-date-input>
+    <app-date-input [label]="i18n.t('end_date')" [(value)]="end"></app-date-input>
+
+    <ion-item>
+      <ion-label position="stacked">{{ i18n.t('type') }}</ion-label>
+      <ion-select [(ngModel)]="type">
+        <ion-select-option value="">{{ i18n.t('all') }}</ion-select-option>
+        <ion-select-option value="EARNING">{{ i18n.enum('status', 'EARNING') }}</ion-select-option>
+        <ion-select-option value="EXPENSE">{{ i18n.enum('status', 'EXPENSE') }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-button expand="block" (click)="runReport()">{{ i18n.t('run_report') }}</ion-button>
+
+    @if (error) {
+      <ion-text color="danger">
+        <p>{{ error }}</p>
+      </ion-text>
+    }
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ i18n.t('summary') }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p>{{ i18n.t('earnings') }}: {{ i18n.formatCurrency(earnings) }}</p>
+        <p>{{ i18n.t('expenses') }}: {{ i18n.formatCurrency(expenses) }}</p>
+        <p>{{ i18n.t('net') }}: {{ i18n.formatCurrency(earnings - expenses) }}</p>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

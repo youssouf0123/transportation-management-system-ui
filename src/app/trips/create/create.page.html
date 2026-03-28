@@ -1,0 +1,56 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ i18n.t('create_trip_title') }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page-shell">
+    <ion-item>
+      <ion-label position="stacked">{{ i18n.t('origin') }}</ion-label>
+      <ion-input [(ngModel)]="trip.origin"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">{{ i18n.t('destination') }}</ion-label>
+      <ion-input [(ngModel)]="trip.destination"></ion-input>
+    </ion-item>
+    <app-date-input [label]="i18n.t('date')" [(value)]="trip.scheduledDate"></app-date-input>
+    <ion-item>
+      <ion-label position="stacked">{{ i18n.t('status') }}</ion-label>
+      <ion-select [(ngModel)]="trip.status">
+        <ion-select-option value="PLANNED">{{ i18n.enum('status', 'PLANNED') }}</ion-select-option>
+        <ion-select-option value="IN_PROGRESS">{{ i18n.enum('status', 'IN_PROGRESS') }}</ion-select-option>
+        <ion-select-option value="COMPLETED">{{ i18n.enum('status', 'COMPLETED') }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">{{ i18n.t('cargo') }}</ion-label>
+      <ion-input [(ngModel)]="trip.cargoDescription"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">{{ i18n.t('entity_driver') }}</ion-label>
+      <ion-select [(ngModel)]="trip.driver">
+        <ion-select-option [value]="null">{{ i18n.t('unassigned') }}</ion-select-option>
+        @for (driver of drivers; track $index) {
+          <ion-select-option [value]="{ id: driver.id }">{{ driver.name }}</ion-select-option>
+        }
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">{{ i18n.t('entity_vehicle') }}</ion-label>
+      <ion-select [(ngModel)]="trip.vehicle">
+        <ion-select-option [value]="null">{{ i18n.t('unassigned') }}</ion-select-option>
+        @for (vehicle of vehicles; track $index) {
+          <ion-select-option [value]="{ id: vehicle.id }">{{ vehicle.plateNumber }}</ion-select-option>
+        }
+      </ion-select>
+    </ion-item>
+    @if (error) {
+      <ion-text color="danger"><p>{{ error }}</p></ion-text>
+    }
+    <ion-button expand="block" (click)="save()">{{ i18n.t('create_trip_button') }}</ion-button>
+  </div>
+</ion-content>

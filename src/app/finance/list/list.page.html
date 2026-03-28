@@ -1,0 +1,142 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ i18n.t('finance_records_title') }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page-shell">
+    <ion-card>
+      <ion-card-header><ion-card-title>{{ i18n.t('finance_filters') }}</ion-card-title></ion-card-header>
+      <ion-card-content class="filter-grid">
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('entity_vehicle') }}</ion-label>
+          <ion-select [(ngModel)]="filters.vehicleId">
+            <ion-select-option [value]="null">{{ i18n.t('all') }}</ion-select-option>
+            @for (vehicle of vehicles; track $index) {
+              <ion-select-option [value]="vehicle.id">{{ vehicle.plateNumber }}</ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('type') }}</ion-label>
+          <ion-select [(ngModel)]="filters.type">
+            <ion-select-option value="">{{ i18n.t('all') }}</ion-select-option>
+            <ion-select-option value="EARNING">{{ i18n.enum('status', 'EARNING') }}</ion-select-option>
+            <ion-select-option value="EXPENSE">{{ i18n.enum('status', 'EXPENSE') }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('scope') }}</ion-label>
+          <ion-select [(ngModel)]="filters.scope">
+            <ion-select-option value="">{{ i18n.t('all') }}</ion-select-option>
+            <ion-select-option value="VEHICLE">{{ i18n.enum('scope', 'VEHICLE') }}</ion-select-option>
+            <ion-select-option value="MISC">{{ i18n.enum('scope', 'MISC') }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('filter_mode') }}</ion-label>
+          <ion-select [(ngModel)]="filterMode" (ionChange)="onFilterModeChange()">
+            <ion-select-option value="date">{{ i18n.t('single_date') }}</ion-select-option>
+            <ion-select-option value="range">{{ i18n.t('date_range') }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        @if (filterMode === 'date') {
+          <app-date-input [label]="i18n.t('date')" [(value)]="filters.date"></app-date-input>
+        }
+        @if (filterMode === 'range') {
+          <app-date-input [label]="i18n.t('start')" [(value)]="filters.start"></app-date-input>
+          <app-date-input [label]="i18n.t('end')" [(value)]="filters.end"></app-date-input>
+        }
+        <ion-button expand="block" (click)="load()">{{ i18n.t('apply_filters') }}</ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header><ion-card-title>{{ i18n.t('finance_ledger') }}</ion-card-title></ion-card-header>
+      <ion-card-content class="stack">
+        @if (error) {
+          <ion-text color="danger"><p>{{ error }}</p></ion-text>
+        }
+
+        @for (record of records; track $index) {
+          <section class="record-card">
+            @if (editingId === record.id && draft) {
+              <div class="filter-grid">
+                <ion-item>
+                  <ion-label position="stacked">{{ i18n.t('description') }}</ion-label>
+                  <ion-input [(ngModel)]="draft.description"></ion-input>
+                </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">{{ i18n.t('type') }}</ion-label>
+                  <ion-select [(ngModel)]="draft.type">
+                    <ion-select-option value="EARNING">{{ i18n.enum('status', 'EARNING') }}</ion-select-option>
+                    <ion-select-option value="EXPENSE">{{ i18n.enum('status', 'EXPENSE') }}</ion-select-option>
+                  </ion-select>
+                </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">{{ i18n.t('category') }}</ion-label>
+                  <ion-input [(ngModel)]="draft.category"></ion-input>
+                </ion-item>
+                <ion-item>
+                  <ion-label position="stacked">{{ i18n.t('amount') }}</ion-label>
+                  <ion-input type="number" [(ngModel)]="draft.amount"></ion-input>
+                </ion-item>
+                <app-date-input [label]="i18n.t('date')" [(value)]="draft.date"></app-date-input>
+                @if (draft.recordScope !== 'MISC') {
+                  <ion-item>
+                    <ion-label position="stacked">{{ i18n.t('entity_driver') }}</ion-label>
+                    <ion-select [(ngModel)]="driverId" (ngModelChange)="onDriverChange()">
+                      @for (driver of drivers; track $index) {
+                        <ion-select-option [value]="driver.id">{{ driver.name }}</ion-select-option>
+                      }
+                    </ion-select>
+                  </ion-item>
+                  @if (driverId) {
+                    <ion-card>
+                      <ion-card-header>
+                        <ion-card-title>{{ i18n.t('assigned_vehicle') }}</ion-card-title>
+                      </ion-card-header>
+                      <ion-card-content>
+                        @if (selectedVehicle) {
+                          <p><strong>{{ i18n.t('plate_number') }}:</strong> {{ selectedVehicle.plateNumber }}</p>
+                          <p><strong>{{ i18n.t('entity_vehicle') }}:</strong> {{ selectedVehicle.make }} {{ selectedVehicle.model }}</p>
+                          <p><strong>{{ i18n.t('status') }}:</strong> {{ i18n.enum('status', selectedVehicle.status, 'ACTIVE') }}</p>
+                          <p><strong>{{ i18n.t('current_mileage') }}:</strong> {{ selectedVehicle.currentMileage || 0 }}</p>
+                        } @else {
+                          <p>{{ i18n.t('no_vehicle_assigned_driver') }}</p>
+                        }
+                      </ion-card-content>
+                    </ion-card>
+                  }
+                } @else {
+                  <ion-item>
+                    <ion-label position="stacked">{{ i18n.t('entity_vehicle') }}</ion-label>
+                    <ion-input [value]="i18n.t('not_applicable_misc')" readonly></ion-input>
+                  </ion-item>
+                }
+              </div>
+              <div class="actions">
+                <ion-button (click)="saveEdit()">{{ i18n.t('save') }}</ion-button>
+                <ion-button fill="outline" (click)="editingId = null; draft = null; driverId = null; selectedVehicle = null">{{ i18n.t('cancel') }}</ion-button>
+              </div>
+            } @else {
+              <h2>{{ localizedDescription(record) }}</h2>
+              <p>{{ record.date }} • {{ i18n.enum('status', record.type) }} • {{ i18n.enum('scope', record.recordScope, 'VEHICLE') }}</p>
+              <p>{{ i18n.t('category') }}: {{ i18n.enum('category', record.category, 'OPERATIONS') }}</p>
+              <p>{{ record.vehicle?.plateNumber || i18n.t('no_vehicle') }}</p>
+              <p>{{ i18n.formatCurrency(record.amount) }}</p>
+              <div class="actions">
+                <ion-button size="small" fill="outline" (click)="startEdit(record)">{{ i18n.t('edit') }}</ion-button>
+                <ion-button size="small" color="danger" fill="outline" (click)="deleteRecord(record.id)">{{ i18n.t('delete') }}</ion-button>
+              </div>
+            }
+          </section>
+        }
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>
