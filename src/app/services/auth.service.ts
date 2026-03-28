@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 
 import { AuthResponse, SessionUser, TeamUser } from '../models/auth.models';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly baseUrl = 'http://localhost:8080';
+  private readonly baseUrl = (window as { __env?: { apiBaseUrl?: string } }).__env?.apiBaseUrl || environment.apiBaseUrl;
   private readonly tokenKey = 'tms_auth_token';
   private readonly userKey = 'tms_auth_user';
   private readonly userSubject = new BehaviorSubject<SessionUser | null>(this.readStoredUser());
