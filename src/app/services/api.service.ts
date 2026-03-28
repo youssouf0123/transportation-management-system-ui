@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { Driver } from '../models/driver.model';
 import { Vehicle } from '../models/vehicle.model';
 import { FinanceRecord } from '../models/finance-record.model';
@@ -16,7 +17,7 @@ import { SearchResponse } from '../models/search-result.model';
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl = 'http://localhost:8080'; // Default Spring Boot port
+  private baseUrl = (window as { __env?: { apiBaseUrl?: string } }).__env?.apiBaseUrl || environment.apiBaseUrl;
 
   constructor(private http: HttpClient) { }
 

@@ -6,7 +6,9 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start:prod": "node server.js",
     "build": "ng build",
+    "heroku-postbuild": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint"
@@ -26,6 +28,7 @@
     "@capacitor/haptics": "6.0.1",
     "@capacitor/keyboard": "6.0.2",
     "@capacitor/status-bar": "6.0.1",
+    "express": "^4.21.2",
     "@ionic/angular": "^8.0.0",
     "ionicons": "^7.0.0",
     "rxjs": "~7.8.1",
@@ -60,4 +63,9 @@
     "typescript": "~5.4.5"
   },
   "description": "An Ionic project"
+  ,
+  "engines": {
+    "node": "20.x",
+    "npm": "10.x"
+  }
 }
