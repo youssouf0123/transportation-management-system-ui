@@ -12,6 +12,7 @@ interface NavSection {
     url: string;
     icon: string;
     roles?: string[];
+    adminOnly?: boolean;
   }>;
 }
 
@@ -82,6 +83,7 @@ export class AppComponent implements OnInit {
       titleKey: 'workspace',
       items: [
         { titleKey: 'team_roles', url: '/users', icon: 'people-circle', roles: ['OWNER', 'MANAGER'] },
+        { titleKey: 'manage_users', url: '/manage-users', icon: 'settings', roles: ['OWNER', 'MANAGER'], adminOnly: true },
         { titleKey: 'document_library', url: '/documents', icon: 'document-text', roles: ['OWNER', 'MANAGER', 'DISPATCHER', 'FINANCE', 'VIEWER'] },
         { titleKey: 'audit_log', url: '/audit', icon: 'shield-checkmark', roles: ['OWNER', 'MANAGER'] },
       ],
@@ -134,12 +136,15 @@ export class AppComponent implements OnInit {
     return this.navSections
       .map(section => ({
         ...section,
-        items: section.items.filter(item => this.canAccessItem(item.roles)),
+        items: section.items.filter(item => this.canAccessItem(item.roles, item.adminOnly)),
       }))
       .filter(section => section.items.length > 0);
   }
 
-  private canAccessItem(roles?: string[]): boolean {
+  private canAccessItem(roles?: string[], adminOnly?: boolean): boolean {
+    if (adminOnly && !this.authService.isPlatformAdmin()) {
+      return false;
+    }
     if (!roles || roles.length === 0) {
       return true;
     }

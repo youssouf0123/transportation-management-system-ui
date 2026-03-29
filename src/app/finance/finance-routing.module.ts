@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { ListPage } from './list/list.page';
 import { CreatePage } from './create/create.page';
 import { ReportsPage } from './reports/reports.page';
+import { roleActivateGuard } from '../services/auth.guard';
 
 const routes: Routes = [
   {
@@ -16,7 +17,8 @@ const routes: Routes = [
   },
   {
     path: 'create',
-    component: CreatePage
+    component: CreatePage,
+    canActivate: [roleActivateGuard(['OWNER', 'MANAGER', 'FINANCE'])]
   },
   {
     path: 'reports',

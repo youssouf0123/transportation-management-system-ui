@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { authGuard, guestGuard, roleGuard } from './services/auth.guard';
+import { authGuard, guestGuard, platformAdminGuard, roleGuard } from './services/auth.guard';
 
 const routes: Routes = [
   {
@@ -57,6 +57,11 @@ const routes: Routes = [
     path: 'users',
     canMatch: [authGuard, roleGuard(['OWNER', 'MANAGER'])],
     loadChildren: () => import('./users/users.module').then( m => m.UsersModule)
+  },
+  {
+    path: 'manage-users',
+    canMatch: [authGuard, platformAdminGuard],
+    loadChildren: () => import('./manage-users/manage-users.module').then( m => m.ManageUsersModule)
   },
   {
     path: 'audit',

@@ -2,6 +2,7 @@ import { Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@an
 
 import { DocumentRecord } from '../models/document-record.model';
 import { ApiService } from '../services/api.service';
+import { AuthService } from '../services/auth.service';
 import { I18nService } from '../services/i18n.service';
 
 @Component({
@@ -40,9 +41,18 @@ export class DocumentsPage implements OnInit, OnDestroy {
 
   constructor(
     private readonly api: ApiService,
+    private readonly auth: AuthService,
     public readonly i18n: I18nService,
     private readonly zone: NgZone,
   ) {}
+
+  get canManageDocuments(): boolean {
+    return this.auth.hasRole('OWNER', 'MANAGER', 'DISPATCHER', 'FINANCE');
+  }
+
+  get canDeleteDocuments(): boolean {
+    return this.auth.hasRole('OWNER', 'MANAGER');
+  }
 
   ngOnInit(): void {
     this.load();
@@ -64,6 +74,10 @@ export class DocumentsPage implements OnInit, OnDestroy {
   }
 
   save(): void {
+    if (!this.canManageDocuments) {
+      return;
+    }
+
     if (!this.editingId && !this.selectedFile) {
       this.error = this.i18n.t('file_required_upload');
       return;
@@ -83,6 +97,10 @@ export class DocumentsPage implements OnInit, OnDestroy {
   }
 
   startEdit(document: DocumentRecord): void {
+    if (!this.canManageDocuments) {
+      return;
+    }
+
     this.editingId = document.id ?? null;
     this.draft = this.api.normalizeDocument({ ...document });
     this.selectedFile = null;
@@ -90,6 +108,10 @@ export class DocumentsPage implements OnInit, OnDestroy {
   }
 
   deleteDocument(id?: number): void {
+    if (!this.canDeleteDocuments) {
+      return;
+    }
+
     if (!id) {
       return;
     }
@@ -115,6 +137,10 @@ export class DocumentsPage implements OnInit, OnDestroy {
   }
 
   resetDraft(): void {
+    if (!this.canManageDocuments) {
+      return;
+    }
+
     this.editingId = null;
     this.selectedFile = null;
     this.selectedFileName = '';
@@ -131,10 +157,18 @@ export class DocumentsPage implements OnInit, OnDestroy {
   }
 
   triggerPicker(input: HTMLInputElement): void {
+    if (!this.canManageDocuments) {
+      return;
+    }
+
     input.click();
   }
 
   onFileSelected(event: Event): void {
+    if (!this.canManageDocuments) {
+      return;
+    }
+
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0] ?? null;
     this.selectedFile = file;
@@ -143,6 +177,10 @@ export class DocumentsPage implements OnInit, OnDestroy {
   }
 
   async openCamera(): Promise<void> {
+    if (!this.canManageDocuments) {
+      return;
+    }
+
     this.cameraError = '';
 
     if (!navigator.mediaDevices?.getUserMedia) {
@@ -175,11 +213,19 @@ export class DocumentsPage implements OnInit, OnDestroy {
   }
 
   closeCamera(): void {
+    if (!this.canManageDocuments) {
+      return;
+    }
+
     this.cameraOpen = false;
     this.stopCamera();
   }
 
   capturePhoto(): void {
+    if (!this.canManageDocuments) {
+      return;
+    }
+
     const video = this.cameraVideo?.nativeElement;
     if (!video || !this.cameraStream) {
       this.cameraError = this.i18n.t('camera_capture_error');

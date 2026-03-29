@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Driver } from '../../models/driver.model';
 import { Vehicle } from '../../models/vehicle.model';
 import { ApiService } from '../../services/api.service';
+import { AuthService } from '../../services/auth.service';
 import { I18nService } from '../../services/i18n.service';
 
 @Component({
@@ -23,6 +24,7 @@ export class AssignPage implements OnInit {
   constructor(
     private readonly api: ApiService,
     private readonly router: Router,
+    public readonly authService: AuthService,
     public readonly i18n: I18nService,
   ) {}
 

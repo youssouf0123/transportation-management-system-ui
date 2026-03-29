@@ -64,7 +64,7 @@
 
         @for (record of records; track $index) {
           <section class="record-card">
-            @if (editingId === record.id && draft) {
+            @if (editingId === record.id && draft && authService.hasRole('OWNER', 'MANAGER', 'FINANCE')) {
               <div class="filter-grid">
                 <ion-item>
                   <ion-label position="stacked">{{ i18n.t('description') }}</ion-label>
@@ -128,10 +128,12 @@
               <p>{{ record.date }} • {{ i18n.enum('status', record.type) }} • {{ i18n.enum('scope', record.recordScope, 'VEHICLE') }}</p>
               <p>{{ record.vehicle?.driver?.name || i18n.t('no_driver_assigned') }}</p>
               <p>{{ i18n.formatCurrency(record.amount) }}</p>
-              <div class="actions">
-                <ion-button size="small" fill="outline" (click)="startEdit(record)">{{ i18n.t('edit') }}</ion-button>
-                <ion-button size="small" color="danger" fill="outline" (click)="deleteRecord(record.id)">{{ i18n.t('delete') }}</ion-button>
-              </div>
+              @if (authService.hasRole('OWNER', 'MANAGER', 'FINANCE')) {
+                <div class="actions">
+                  <ion-button size="small" fill="outline" (click)="startEdit(record)">{{ i18n.t('edit') }}</ion-button>
+                  <ion-button size="small" color="danger" fill="outline" (click)="deleteRecord(record.id)">{{ i18n.t('delete') }}</ion-button>
+                </div>
+              }
             }
           </section>
         }

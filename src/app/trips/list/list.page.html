@@ -57,7 +57,7 @@
 
         @for (trip of trips; track $index) {
           <section class="record-card">
-            @if (editingId === trip.id && draft) {
+            @if (editingId === trip.id && draft && authService.hasRole('OWNER', 'MANAGER', 'DISPATCHER')) {
               <div class="filter-grid">
                 <ion-item>
                   <ion-label position="stacked">{{ i18n.t('origin') }}</ion-label>
@@ -104,10 +104,12 @@
               <p>{{ trip.scheduledDate }} • {{ i18n.enum('status', trip.status, 'PLANNED') }}</p>
               <p>{{ i18n.t('entity_driver') }}: {{ trip.driver?.name || i18n.t('unassigned') }}</p>
               <p>{{ i18n.t('entity_vehicle') }}: {{ trip.vehicle?.plateNumber || i18n.t('unassigned') }}</p>
-              <div class="actions">
-                <ion-button size="small" fill="outline" (click)="startEdit(trip)">{{ i18n.t('edit') }}</ion-button>
-                <ion-button size="small" color="danger" fill="outline" (click)="deleteTrip(trip.id)">{{ i18n.t('delete') }}</ion-button>
-              </div>
+              @if (authService.hasRole('OWNER', 'MANAGER', 'DISPATCHER')) {
+                <div class="actions">
+                  <ion-button size="small" fill="outline" (click)="startEdit(trip)">{{ i18n.t('edit') }}</ion-button>
+                  <ion-button size="small" color="danger" fill="outline" (click)="deleteTrip(trip.id)">{{ i18n.t('delete') }}</ion-button>
+                </div>
+              }
             }
           </section>
         }

@@ -41,7 +41,7 @@
       <ion-card-content class="stack">
         @for (record of records; track $index) {
           <section class="record-card">
-            @if (editingId === record.id && draft) {
+            @if (editingId === record.id && draft && authService.hasRole('OWNER', 'MANAGER', 'DISPATCHER')) {
               <div class="filter-grid">
                 <ion-item>
                   <ion-label position="stacked">{{ i18n.t('service_type') }}</ion-label>
@@ -98,10 +98,12 @@
               <p>{{ record.serviceDate }} • {{ i18n.enum('status', record.status, 'SCHEDULED') }}</p>
               <p>{{ i18n.t('entity_vehicle') }}: {{ record.vehicle?.plateNumber || i18n.t('no_vehicle') }}</p>
               <p>{{ i18n.t('cost_label') }}: {{ i18n.formatCurrency(record.cost) }}</p>
-              <div class="actions">
-                <ion-button size="small" fill="outline" (click)="startEdit(record)">{{ i18n.t('edit') }}</ion-button>
-                <ion-button size="small" color="danger" fill="outline" (click)="deleteRecord(record.id)">{{ i18n.t('delete') }}</ion-button>
-              </div>
+              @if (authService.hasRole('OWNER', 'MANAGER', 'DISPATCHER')) {
+                <div class="actions">
+                  <ion-button size="small" fill="outline" (click)="startEdit(record)">{{ i18n.t('edit') }}</ion-button>
+                  <ion-button size="small" color="danger" fill="outline" (click)="deleteRecord(record.id)">{{ i18n.t('delete') }}</ion-button>
+                </div>
+              }
             }
           </section>
         }

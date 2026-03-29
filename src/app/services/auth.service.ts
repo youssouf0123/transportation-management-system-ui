@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 
-import { AuthResponse, SessionUser, TeamUser } from '../models/auth.models';
+import { AuthResponse, SessionUser, TeamUser, WorkspaceAdminOverview, WorkspaceSummary } from '../models/auth.models';
 import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -23,13 +23,21 @@ export class AuthService {
     password: string;
   }): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.baseUrl}/auth/register`, payload).pipe(
-      tap(response => this.storeSession(response))
+      tap(response => {
+        if (response.token && response.user) {
+          this.storeSession(response);
+        }
+      })
     );
   }
 
   login(payload: { email: string; password: string }): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.baseUrl}/auth/login`, payload).pipe(
-      tap(response => this.storeSession(response))
+      tap(response => {
+        if (response.token && response.user) {
+          this.storeSession(response);
+        }
+      })
     );
   }
 
@@ -47,6 +55,46 @@ export class AuthService {
 
   updateUserRole(id: number, role: string): Observable<TeamUser> {
     return this.http.put<TeamUser>(`${this.baseUrl}/users/${id}/role`, { role });
+  }
+
+  updateUser(id: number, payload: { fullName: string; email: string; role: string; password?: string }): Observable<TeamUser> {
+    return this.http.put<TeamUser>(`${this.baseUrl}/users/${id}`, payload);
+  }
+
+  updateUserStatus(id: number, status: string): Observable<TeamUser> {
+    return this.http.put<TeamUser>(`${this.baseUrl}/users/${id}/status`, { status });
+  }
+
+  deleteUser(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/users/${id}`);
+  }
+
+  getWorkspaceAdminOverview(): Observable<WorkspaceAdminOverview> {
+    return this.http.get<WorkspaceAdminOverview>(`${this.baseUrl}/admin/workspaces`);
+  }
+
+  updateWorkspace(id: number, payload: { name?: string; status?: string }): Observable<WorkspaceSummary> {
+    return this.http.put<WorkspaceSummary>(`${this.baseUrl}/admin/workspaces/${id}`, payload);
+  }
+
+  updateWorkspaceStatus(id: number, status: string): Observable<WorkspaceSummary> {
+    return this.http.put<WorkspaceSummary>(`${this.baseUrl}/admin/workspaces/${id}/status`, { status });
+  }
+
+  deleteWorkspace(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/admin/workspaces/${id}`);
+  }
+
+  updateAdminUser(id: number, payload: { fullName: string; email: string; role: string }): Observable<TeamUser> {
+    return this.http.put<TeamUser>(`${this.baseUrl}/admin/users/${id}`, payload);
+  }
+
+  updateAdminUserStatus(id: number, status: string): Observable<TeamUser> {
+    return this.http.put<TeamUser>(`${this.baseUrl}/admin/users/${id}/status`, { status });
+  }
+
+  deleteAdminUser(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/admin/users/${id}`);
   }
 
   logout(): void {
@@ -72,7 +120,17 @@ export class AuthService {
     return !!currentRole && roles.some(role => role.toUpperCase() === currentRole.toUpperCase());
   }
 
+  isPlatformAdmin(): boolean {
+    const user = this.getCurrentUser();
+    return !!user
+      && user.fullName === 'Youssouf Diarra'
+      && user.email === 'dyoussouf12@gmail.com';
+  }
+
   private storeSession(response: AuthResponse): void {
+    if (!response.token || !response.user) {
+      return;
+    }
     localStorage.setItem(this.tokenKey, response.token);
     localStorage.setItem(this.userKey, JSON.stringify(response.user));
     this.userSubject.next(response.user);

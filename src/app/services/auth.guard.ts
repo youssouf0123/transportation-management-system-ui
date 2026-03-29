@@ -1,5 +1,5 @@
 import { inject } from '@angular/core';
-import { CanMatchFn, Router, UrlSegment } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivateFn, CanMatchFn, Router, RouterStateSnapshot, UrlSegment } from '@angular/router';
 
 import { AuthService } from './auth.service';
 
@@ -15,9 +15,32 @@ export const guestGuard: CanMatchFn = () => {
   return authService.isAuthenticated() ? redirectTo('/home') : true;
 };
 
+const hasRequiredRole = (roles: string[]) => {
+  const authService = inject(AuthService);
+  return authService.hasRole(...roles) ? true : redirectTo('/home');
+};
+
+const hasPlatformAdminAccess = () => {
+  const authService = inject(AuthService);
+  return authService.isPlatformAdmin() ? true : redirectTo('/home');
+};
+
 export const roleGuard = (roles: string[]): CanMatchFn => {
   return (_route, _segments: UrlSegment[]) => {
-    const authService = inject(AuthService);
-    return authService.hasRole(...roles) ? true : redirectTo('/home');
+    return hasRequiredRole(roles);
   };
+};
+
+export const roleActivateGuard = (roles: string[]): CanActivateFn => {
+  return (_route: ActivatedRouteSnapshot, _state: RouterStateSnapshot) => {
+    return hasRequiredRole(roles);
+  };
+};
+
+export const platformAdminGuard: CanMatchFn = () => {
+  return hasPlatformAdminAccess();
+};
+
+export const platformAdminActivateGuard: CanActivateFn = () => {
+  return hasPlatformAdminAccess();
 };

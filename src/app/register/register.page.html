@@ -25,6 +25,9 @@
         @if (error) {
           <ion-text color="danger"><p>{{ error }}</p></ion-text>
         }
+        @if (message) {
+          <ion-text color="success"><p>{{ message }}</p></ion-text>
+        }
         <ion-button expand="block" (click)="register()">{{ i18n.t('create_workspace') }}</ion-button>
         <ion-button expand="block" fill="outline" routerLink="/login">{{ i18n.t('back_to_sign_in') }}</ion-button>
       </ion-card-content>

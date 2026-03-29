@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { AuthService } from '../services/auth.service';
 import { I18nService } from '../services/i18n.service';
@@ -16,6 +17,7 @@ export class RegisterPage {
   email = '';
   password = '';
   error = '';
+  message = '';
 
   constructor(
     private readonly authService: AuthService,
@@ -31,14 +33,22 @@ export class RegisterPage {
 
   register(): void {
     this.error = '';
+    this.message = '';
     this.authService.register({
       organizationName: this.organizationName,
       fullName: this.fullName,
       email: this.email,
       password: this.password,
     }).subscribe({
-      next: () => this.router.navigateByUrl('/home'),
-      error: () => this.error = this.i18n.t('create_organization_error'),
+      next: response => {
+        if (response.pendingApproval) {
+          this.message = response.message || this.i18n.t('workspace_request_submitted');
+          this.password = '';
+          return;
+        }
+        this.router.navigateByUrl('/home');
+      },
+      error: (error: HttpErrorResponse) => this.error = error.error?.message || this.i18n.t('create_organization_error'),
     });
   }
 }

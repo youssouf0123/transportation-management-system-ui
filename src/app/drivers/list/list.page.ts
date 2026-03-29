@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { Driver } from '../../models/driver.model';
 import { ApiService } from '../../services/api.service';
+import { AuthService } from '../../services/auth.service';
 import { I18nService } from '../../services/i18n.service';
 
 @Component({
@@ -22,6 +23,7 @@ export class ListPage implements OnInit {
 
   constructor(
     private readonly api: ApiService,
+    public readonly authService: AuthService,
     public readonly i18n: I18nService,
   ) {}
 

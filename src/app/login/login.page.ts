@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 
 import { AuthService } from '../services/auth.service';
@@ -31,7 +32,7 @@ export class LoginPage {
     this.error = '';
     this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: () => this.router.navigateByUrl('/home'),
-      error: () => this.error = this.i18n.t('sign_in_error'),
+      error: (error: HttpErrorResponse) => this.error = error.error?.message || this.i18n.t('sign_in_error'),
     });
   }
 }

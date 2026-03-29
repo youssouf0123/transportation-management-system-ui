@@ -5,6 +5,7 @@ import { Driver } from '../../models/driver.model';
 import { MaintenanceRecord } from '../../models/maintenance-record.model';
 import { Vehicle } from '../../models/vehicle.model';
 import { ApiService } from '../../services/api.service';
+import { AuthService } from '../../services/auth.service';
 import { I18nService } from '../../services/i18n.service';
 
 @Component({
@@ -32,6 +33,7 @@ export class CreatePage implements OnInit {
   constructor(
     private readonly api: ApiService,
     private readonly router: Router,
+    public readonly authService: AuthService,
     public readonly i18n: I18nService,
   ) {}
 

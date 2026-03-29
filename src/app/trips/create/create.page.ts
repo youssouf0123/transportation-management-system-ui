@@ -5,6 +5,7 @@ import { Driver } from '../../models/driver.model';
 import { Trip } from '../../models/trip.model';
 import { Vehicle } from '../../models/vehicle.model';
 import { ApiService } from '../../services/api.service';
+import { AuthService } from '../../services/auth.service';
 import { I18nService } from '../../services/i18n.service';
 
 @Component({
@@ -31,6 +32,7 @@ export class CreatePage implements OnInit {
   constructor(
     private readonly api: ApiService,
     private readonly router: Router,
+    public readonly authService: AuthService,
     public readonly i18n: I18nService,
   ) {}
 
@@ -40,6 +42,16 @@ export class CreatePage implements OnInit {
   }
 
   save(): void {
+    this.error = '';
+    if (!this.trip.origin?.trim()) {
+      this.error = this.i18n.t('trip_origin_required');
+      return;
+    }
+    if (!this.trip.destination?.trim()) {
+      this.error = this.i18n.t('trip_destination_required');
+      return;
+    }
+
     const payload: Trip = {
       ...this.trip,
       scheduledDate: this.trip.scheduledDate?.trim() ? this.trip.scheduledDate : this.today(),

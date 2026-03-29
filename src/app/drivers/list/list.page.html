@@ -47,7 +47,7 @@
 
         @for (driver of drivers; track $index) {
           <section class="record-card">
-            @if (editingId === driver.id && draft) {
+            @if (editingId === driver.id && draft && authService.hasRole('OWNER', 'MANAGER', 'DISPATCHER')) {
               <div class="filter-grid">
                 <ion-item>
                   <ion-label position="stacked">{{ i18n.t('name') }}</ion-label>
@@ -79,10 +79,12 @@
               <p>{{ driver.licenseNumber }}</p>
               <p>{{ driver.phoneNumber || i18n.t('no_phone_number') }}</p>
               <ion-chip>{{ i18n.enum('status', driver.status, 'AVAILABLE') }}</ion-chip>
-              <div class="actions">
-                <ion-button size="small" fill="outline" (click)="startEdit(driver)">{{ i18n.t('edit') }}</ion-button>
-                <ion-button size="small" color="danger" fill="outline" (click)="deleteDriver(driver.id)">{{ i18n.t('delete') }}</ion-button>
-              </div>
+              @if (authService.hasRole('OWNER', 'MANAGER', 'DISPATCHER')) {
+                <div class="actions">
+                  <ion-button size="small" fill="outline" (click)="startEdit(driver)">{{ i18n.t('edit') }}</ion-button>
+                  <ion-button size="small" color="danger" fill="outline" (click)="deleteDriver(driver.id)">{{ i18n.t('delete') }}</ion-button>
+                </div>
+              }
             }
           </section>
         }

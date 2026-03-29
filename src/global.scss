@@ -75,6 +75,11 @@ ion-card {
   backdrop-filter: blur(14px);
 }
 
+ion-text[color="danger"],
+ion-text[color="danger"] p {
+  color: var(--ion-color-danger) !important;
+}
+
 body.dark {
   background:
     radial-gradient(circle at top left, rgba(83, 129, 255, 0.12), transparent 24%),
@@ -89,6 +94,11 @@ body.dark ion-toolbar {
 body.dark ion-card {
   background: rgba(15, 24, 32, 0.88);
   color: #edf6f2;
+}
+
+body.dark ion-text[color="danger"],
+body.dark ion-text[color="danger"] p {
+  color: #ff8d8d !important;
 }
 
 body.dark ion-item {

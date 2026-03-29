@@ -40,18 +40,48 @@
       <ion-card-content class="stack">
         @for (user of users; track $index) {
           <section class="record-card">
-            <h2>{{ user.fullName }}</h2>
-            <p>{{ user.email }}</p>
-            <ion-item>
-              <ion-label position="stacked">{{ i18n.t('role') }}</ion-label>
-              <ion-select [ngModel]="user.role" (ngModelChange)="updateRole(user, $event)">
-                <ion-select-option value="OWNER">{{ i18n.enum('role', 'OWNER') }}</ion-select-option>
-                <ion-select-option value="MANAGER">{{ i18n.enum('role', 'MANAGER') }}</ion-select-option>
-                <ion-select-option value="DISPATCHER">{{ i18n.enum('role', 'DISPATCHER') }}</ion-select-option>
-                <ion-select-option value="FINANCE">{{ i18n.enum('role', 'FINANCE') }}</ion-select-option>
-                <ion-select-option value="VIEWER">{{ i18n.enum('role', 'VIEWER') }}</ion-select-option>
-              </ion-select>
-            </ion-item>
+            @if (editingUserId === user.id) {
+              <div class="stack">
+                <ion-item><ion-label position="stacked">{{ i18n.t('full_name') }}</ion-label><ion-input [(ngModel)]="editDraft.fullName"></ion-input></ion-item>
+                <ion-item><ion-label position="stacked">{{ i18n.t('email') }}</ion-label><ion-input [(ngModel)]="editDraft.email"></ion-input></ion-item>
+                <ion-item><ion-label position="stacked">{{ i18n.t('password') }}</ion-label><ion-input type="password" [(ngModel)]="editDraft.password" [placeholder]="i18n.t('leave_blank_keep_password')"></ion-input></ion-item>
+                <ion-item>
+                  <ion-label position="stacked">{{ i18n.t('role') }}</ion-label>
+                  <ion-select [(ngModel)]="editDraft.role">
+                    <ion-select-option value="OWNER">{{ i18n.enum('role', 'OWNER') }}</ion-select-option>
+                    <ion-select-option value="MANAGER">{{ i18n.enum('role', 'MANAGER') }}</ion-select-option>
+                    <ion-select-option value="DISPATCHER">{{ i18n.enum('role', 'DISPATCHER') }}</ion-select-option>
+                    <ion-select-option value="FINANCE">{{ i18n.enum('role', 'FINANCE') }}</ion-select-option>
+                    <ion-select-option value="VIEWER">{{ i18n.enum('role', 'VIEWER') }}</ion-select-option>
+                  </ion-select>
+                </ion-item>
+                <div class="actions-row">
+                  <ion-button (click)="saveEdit(user)">{{ i18n.t('save') }}</ion-button>
+                  <ion-button fill="outline" (click)="cancelEdit()">{{ i18n.t('cancel') }}</ion-button>
+                </div>
+              </div>
+            } @else {
+              <h2>{{ user.fullName }}</h2>
+              <p>{{ user.email }}</p>
+              <p>{{ i18n.t('status') }}: {{ user.status === 'ACTIVE' ? i18n.t('approved') : i18n.t('revoked') }}</p>
+              <ion-item>
+                <ion-label position="stacked">{{ i18n.t('role') }}</ion-label>
+                <ion-select [ngModel]="user.role" (ngModelChange)="updateRole(user, $event)">
+                  <ion-select-option value="OWNER">{{ i18n.enum('role', 'OWNER') }}</ion-select-option>
+                  <ion-select-option value="MANAGER">{{ i18n.enum('role', 'MANAGER') }}</ion-select-option>
+                  <ion-select-option value="DISPATCHER">{{ i18n.enum('role', 'DISPATCHER') }}</ion-select-option>
+                  <ion-select-option value="FINANCE">{{ i18n.enum('role', 'FINANCE') }}</ion-select-option>
+                  <ion-select-option value="VIEWER">{{ i18n.enum('role', 'VIEWER') }}</ion-select-option>
+                </ion-select>
+              </ion-item>
+              <div class="actions-row">
+                <ion-button size="small" fill="outline" (click)="startEdit(user)">{{ i18n.t('edit') }}</ion-button>
+                <ion-button size="small" fill="outline" color="warning" (click)="updateUserStatus(user, nextStatus(user))">{{ statusActionLabel(user) }}</ion-button>
+                @if (canDeleteUsers) {
+                  <ion-button size="small" color="danger" fill="outline" (click)="deleteUser(user)">{{ i18n.t('delete') }}</ion-button>
+                }
+              </div>
+            }
           </section>
         }
       </ion-card-content>

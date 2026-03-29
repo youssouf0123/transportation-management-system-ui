@@ -1,0 +1,124 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>{{ i18n.t('manage_users') }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="page-shell">
+    @if (error) {
+      <ion-text color="danger"><p>{{ error }}</p></ion-text>
+    }
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ i18n.t('workspace_requests') }}</ion-card-title>
+        <ion-card-subtitle>{{ i18n.t('workspace_requests_help') }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content class="stack">
+        @if (requests.length === 0) {
+          <p>{{ i18n.t('no_workspace_requests') }}</p>
+        }
+        @for (workspace of requests; track workspace.id) {
+          <section class="record-card">
+            <h2>{{ workspace.name }}</h2>
+            <p>{{ i18n.t('status') }}: {{ workspace.status }}</p>
+            @if (ownerUser(workspace); as owner) {
+              <p>{{ owner.fullName }} • {{ owner.email }}</p>
+            }
+            <div class="actions-row">
+              <ion-button size="small" (click)="updateWorkspaceStatus(workspace, 'APPROVED')">{{ i18n.t('accept_request') }}</ion-button>
+              <ion-button size="small" fill="outline" color="warning" (click)="updateWorkspaceStatus(workspace, 'REVOKED')">{{ i18n.t('revoke_access') }}</ion-button>
+            </div>
+          </section>
+        }
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ i18n.t('all_workspaces') }}</ion-card-title>
+        <ion-card-subtitle>{{ i18n.t('workspace_user_directory') }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content class="stack">
+        @for (workspace of organizations; track workspace.id) {
+          <section class="record-card workspace-card">
+            @if (editingWorkspaceId === workspace.id) {
+              <div class="stack">
+                <ion-item><ion-label position="stacked">{{ i18n.t('organization_name') }}</ion-label><ion-input [(ngModel)]="workspaceDraft.name"></ion-input></ion-item>
+                <ion-item>
+                  <ion-label position="stacked">{{ i18n.t('status') }}</ion-label>
+                  <ion-select [(ngModel)]="workspaceDraft.status">
+                    <ion-select-option value="APPROVED">{{ i18n.t('approved') }}</ion-select-option>
+                    <ion-select-option value="PENDING">{{ i18n.t('pending') }}</ion-select-option>
+                    <ion-select-option value="REVOKED">{{ i18n.t('revoked') }}</ion-select-option>
+                  </ion-select>
+                </ion-item>
+                <div class="actions-row">
+                  <ion-button size="small" (click)="saveWorkspace(workspace)">{{ i18n.t('save') }}</ion-button>
+                  <ion-button size="small" fill="outline" (click)="cancelWorkspaceEdit()">{{ i18n.t('cancel') }}</ion-button>
+                </div>
+              </div>
+            } @else {
+              <div class="workspace-header">
+                <div>
+                  <h2>{{ workspace.name }}</h2>
+                  <p>{{ i18n.t('status') }}: {{ workspace.status }}</p>
+                </div>
+                <div class="actions-row">
+                  <ion-button size="small" fill="outline" (click)="startWorkspaceEdit(workspace)">{{ i18n.t('edit') }}</ion-button>
+                  @if (workspace.status === 'APPROVED') {
+                    <ion-button size="small" fill="outline" color="warning" (click)="updateWorkspaceStatus(workspace, 'REVOKED')">{{ i18n.t('revoke_access') }}</ion-button>
+                  } @else {
+                    <ion-button size="small" (click)="updateWorkspaceStatus(workspace, 'APPROVED')">{{ i18n.t('accept_request') }}</ion-button>
+                  }
+                  <ion-button size="small" fill="outline" color="danger" (click)="deleteWorkspace(workspace)">{{ i18n.t('delete') }}</ion-button>
+                </div>
+              </div>
+            }
+
+            <div class="stack nested-stack">
+              @for (user of workspace.users; track user.id) {
+                <section class="user-card">
+                  @if (editingUserId === user.id) {
+                    <div class="stack">
+                      <ion-item><ion-label position="stacked">{{ i18n.t('full_name') }}</ion-label><ion-input [(ngModel)]="userDraft.fullName"></ion-input></ion-item>
+                      <ion-item><ion-label position="stacked">{{ i18n.t('email') }}</ion-label><ion-input [(ngModel)]="userDraft.email"></ion-input></ion-item>
+                      <ion-item>
+                        <ion-label position="stacked">{{ i18n.t('role') }}</ion-label>
+                        <ion-select [(ngModel)]="userDraft.role">
+                          <ion-select-option value="OWNER">{{ i18n.enum('role', 'OWNER') }}</ion-select-option>
+                          <ion-select-option value="MANAGER">{{ i18n.enum('role', 'MANAGER') }}</ion-select-option>
+                          <ion-select-option value="DISPATCHER">{{ i18n.enum('role', 'DISPATCHER') }}</ion-select-option>
+                          <ion-select-option value="FINANCE">{{ i18n.enum('role', 'FINANCE') }}</ion-select-option>
+                          <ion-select-option value="VIEWER">{{ i18n.enum('role', 'VIEWER') }}</ion-select-option>
+                        </ion-select>
+                      </ion-item>
+                      <div class="actions-row">
+                        <ion-button size="small" (click)="saveUser(user)">{{ i18n.t('save') }}</ion-button>
+                        <ion-button size="small" fill="outline" (click)="cancelUserEdit()">{{ i18n.t('cancel') }}</ion-button>
+                      </div>
+                    </div>
+                  } @else {
+                    <h3>{{ user.fullName }}</h3>
+                    <p>{{ user.email }}</p>
+                    <p>{{ i18n.t('role') }}: {{ i18n.enum('role', user.role) }}</p>
+                    <p>{{ i18n.t('status') }}: {{ userStatusLabel(user) }}</p>
+                    <div class="actions-row">
+                      <ion-button size="small" fill="outline" (click)="startUserEdit(user)">{{ i18n.t('edit') }}</ion-button>
+                      <ion-button size="small" fill="outline" color="warning" (click)="updateUserStatus(user, nextUserStatus(user))">{{ userStatusAction(user) }}</ion-button>
+                      <ion-button size="small" fill="outline" color="danger" (click)="deleteUser(user)">{{ i18n.t('delete') }}</ion-button>
+                    </div>
+                  }
+                </section>
+              }
+            </div>
+          </section>
+        }
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

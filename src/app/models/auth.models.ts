@@ -5,11 +5,15 @@ export interface SessionUser {
   role: string;
   organizationName: string;
   organizationId: number;
+  organizationStatus?: string;
 }
 
 export interface AuthResponse {
-  token: string;
-  user: SessionUser;
+  token?: string;
+  user?: SessionUser;
+  pendingApproval?: boolean;
+  organizationStatus?: string;
+  message?: string;
 }
 
 export interface TeamUser {
@@ -17,5 +21,19 @@ export interface TeamUser {
   fullName: string;
   email: string;
   role: string;
+  status: string;
   organizationName: string;
+  organizationId: number;
+}
+
+export interface WorkspaceSummary {
+  id: number;
+  name: string;
+  status: string;
+  users: TeamUser[];
+}
+
+export interface WorkspaceAdminOverview {
+  organizations: WorkspaceSummary[];
+  requests: WorkspaceSummary[];
 }

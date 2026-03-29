@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { ListPage } from './list/list.page';
 import { CreatePage } from './create/create.page';
 import { AssignPage } from './assign/assign.page';
+import { roleActivateGuard } from '../services/auth.guard';
 
 const routes: Routes = [
   {
@@ -16,11 +17,13 @@ const routes: Routes = [
   },
   {
     path: 'create',
-    component: CreatePage
+    component: CreatePage,
+    canActivate: [roleActivateGuard(['OWNER', 'MANAGER', 'DISPATCHER'])]
   },
   {
     path: 'assign',
-    component: AssignPage
+    component: AssignPage,
+    canActivate: [roleActivateGuard(['OWNER', 'MANAGER', 'DISPATCHER'])]
   }
 ];
 
