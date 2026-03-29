@@ -13,11 +13,11 @@
       <ion-card-header><ion-card-title>{{ i18n.t('finance_filters') }}</ion-card-title></ion-card-header>
       <ion-card-content class="filter-grid">
         <ion-item>
-          <ion-label position="stacked">{{ i18n.t('entity_vehicle') }}</ion-label>
-          <ion-select [(ngModel)]="filters.vehicleId">
+          <ion-label position="stacked">{{ i18n.t('entity_driver') }}</ion-label>
+          <ion-select [(ngModel)]="filters.driverId">
             <ion-select-option [value]="null">{{ i18n.t('all') }}</ion-select-option>
-            @for (vehicle of vehicles; track $index) {
-              <ion-select-option [value]="vehicle.id">{{ vehicle.plateNumber }}</ion-select-option>
+            @for (driver of drivers; track $index) {
+              <ion-select-option [value]="driver.id">{{ driver.name }}</ion-select-option>
             }
           </ion-select>
         </ion-item>
@@ -126,8 +126,7 @@
             } @else {
               <h2>{{ localizedDescription(record) }}</h2>
               <p>{{ record.date }} • {{ i18n.enum('status', record.type) }} • {{ i18n.enum('scope', record.recordScope, 'VEHICLE') }}</p>
-              <p>{{ i18n.t('category') }}: {{ i18n.enum('category', record.category, 'OPERATIONS') }}</p>
-              <p>{{ record.vehicle?.plateNumber || i18n.t('no_vehicle') }}</p>
+              <p>{{ record.vehicle?.driver?.name || i18n.t('no_driver_assigned') }}</p>
               <p>{{ i18n.formatCurrency(record.amount) }}</p>
               <div class="actions">
                 <ion-button size="small" fill="outline" (click)="startEdit(record)">{{ i18n.t('edit') }}</ion-button>

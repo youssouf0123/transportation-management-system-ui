@@ -18,7 +18,7 @@ export class ListPage implements OnInit {
   vehicles: Vehicle[] = [];
   filterMode: 'date' | 'range' = 'date';
   filters = {
-    vehicleId: null as number | null,
+    driverId: null as number | null,
     type: '',
     scope: '',
     date: '',

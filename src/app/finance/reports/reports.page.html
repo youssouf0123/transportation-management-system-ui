@@ -9,8 +9,32 @@
 
 <ion-content [fullscreen]="true">
   <div class="page-shell">
-    <app-date-input [label]="i18n.t('start_date')" [(value)]="start"></app-date-input>
-    <app-date-input [label]="i18n.t('end_date')" [(value)]="end"></app-date-input>
+    <ion-item>
+      <ion-label position="stacked">{{ i18n.t('filter_mode') }}</ion-label>
+      <ion-select [(ngModel)]="filterMode" (ionChange)="onFilterModeChange()">
+        <ion-select-option value="date">{{ i18n.t('single_date') }}</ion-select-option>
+        <ion-select-option value="range">{{ i18n.t('date_range') }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    @if (filterMode === 'date') {
+      <app-date-input [label]="i18n.t('date')" [(value)]="date"></app-date-input>
+    }
+
+    @if (filterMode === 'range') {
+      <app-date-input [label]="i18n.t('start_date')" [(value)]="start"></app-date-input>
+      <app-date-input [label]="i18n.t('end_date')" [(value)]="end"></app-date-input>
+    }
+
+    <ion-item>
+      <ion-label position="stacked">{{ i18n.t('entity_driver') }}</ion-label>
+      <ion-select [(ngModel)]="driverId">
+        <ion-select-option [value]="null">{{ i18n.t('all') }}</ion-select-option>
+        @for (driver of drivers; track $index) {
+          <ion-select-option [value]="driver.id">{{ driver.name }}</ion-select-option>
+        }
+      </ion-select>
+    </ion-item>
 
     <ion-item>
       <ion-label position="stacked">{{ i18n.t('type') }}</ion-label>
