@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 import { TeamUser } from '../models/auth.models';
 import { AuthService } from '../services/auth.service';
+import { ConfirmService } from '../services/confirm.service';
 import { I18nService } from '../services/i18n.service';
 
 @Component({
@@ -30,6 +31,7 @@ export class UsersPage implements OnInit {
 
   constructor(
     public readonly authService: AuthService,
+    private readonly confirmService: ConfirmService,
     public readonly i18n: I18nService,
   ) {}
 
@@ -43,7 +45,7 @@ export class UsersPage implements OnInit {
 
   load(): void {
     this.authService.getUsers().subscribe({
-      next: users => this.users = users,
+      next: users => this.users = users.filter(user => !this.isPlatformAdminUser(user)),
       error: () => this.error = this.i18n.t('load_team_members_error'),
     });
   }
@@ -102,8 +104,11 @@ export class UsersPage implements OnInit {
     });
   }
 
-  deleteUser(user: TeamUser): void {
+  async deleteUser(user: TeamUser): Promise<void> {
     this.error = '';
+    if (!await this.confirmService.confirmDelete()) {
+      return;
+    }
     this.authService.deleteUser(user.id).subscribe({
       next: () => {
         if (this.editingUserId === user.id) {
@@ -125,5 +130,9 @@ export class UsersPage implements OnInit {
 
   nextStatus(user: TeamUser): string {
     return user.status === 'ACTIVE' ? 'REVOKED' : 'ACTIVE';
+  }
+
+  private isPlatformAdminUser(user: TeamUser): boolean {
+    return user.fullName === 'Youssouf Diarra' && user.email === 'dyoussouf12@gmail.com';
   }
 }

@@ -5,6 +5,7 @@ import { MaintenanceRecord } from '../../models/maintenance-record.model';
 import { Vehicle } from '../../models/vehicle.model';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
+import { ConfirmService } from '../../services/confirm.service';
 import { I18nService } from '../../services/i18n.service';
 
 @Component({
@@ -30,6 +31,7 @@ export class ListPage implements OnInit {
 
   constructor(
     private readonly api: ApiService,
+    private readonly confirmService: ConfirmService,
     public readonly authService: AuthService,
     public readonly i18n: I18nService,
   ) {}
@@ -110,8 +112,11 @@ export class ListPage implements OnInit {
     });
   }
 
-  deleteRecord(id?: number): void {
+  async deleteRecord(id?: number): Promise<void> {
     if (!id) {
+      return;
+    }
+    if (!await this.confirmService.confirmDelete()) {
       return;
     }
     this.api.deleteMaintenanceRecord(id).subscribe(() => this.loadRecords());

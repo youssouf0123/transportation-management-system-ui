@@ -18,6 +18,7 @@ export class RegisterPage {
   password = '';
   error = '';
   message = '';
+  fieldErrors: string[] = [];
 
   constructor(
     private readonly authService: AuthService,
@@ -34,10 +35,32 @@ export class RegisterPage {
   register(): void {
     this.error = '';
     this.message = '';
+    this.fieldErrors = [];
+
+    if (!this.organizationName.trim()) {
+      this.fieldErrors.push(this.i18n.t('organization_name_required'));
+    }
+
+    if (!this.fullName.trim()) {
+      this.fieldErrors.push(this.i18n.t('full_name_required'));
+    }
+
+    if (!this.email.trim()) {
+      this.fieldErrors.push(this.i18n.t('email_required'));
+    }
+
+    if (!this.password.trim()) {
+      this.fieldErrors.push(this.i18n.t('password_required'));
+    }
+
+    if (this.fieldErrors.length > 0) {
+      return;
+    }
+
     this.authService.register({
-      organizationName: this.organizationName,
-      fullName: this.fullName,
-      email: this.email,
+      organizationName: this.organizationName.trim(),
+      fullName: this.fullName.trim(),
+      email: this.email.trim(),
       password: this.password,
     }).subscribe({
       next: response => {

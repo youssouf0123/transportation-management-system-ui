@@ -8,20 +8,27 @@
       <ion-card-content class="stack">
         <ion-item>
           <ion-label position="stacked">{{ i18n.t('organization_name') }}</ion-label>
-          <ion-input [(ngModel)]="organizationName"></ion-input>
+          <ion-input [(ngModel)]="organizationName" required></ion-input>
         </ion-item>
         <ion-item>
           <ion-label position="stacked">{{ i18n.t('full_name') }}</ion-label>
-          <ion-input [(ngModel)]="fullName"></ion-input>
+          <ion-input [(ngModel)]="fullName" required></ion-input>
         </ion-item>
         <ion-item>
           <ion-label position="stacked">{{ i18n.t('email') }}</ion-label>
-          <ion-input [(ngModel)]="email"></ion-input>
+          <ion-input [(ngModel)]="email" type="email" required></ion-input>
         </ion-item>
         <ion-item>
           <ion-label position="stacked">{{ i18n.t('password') }}</ion-label>
-          <ion-input type="password" [(ngModel)]="password"></ion-input>
+          <ion-input type="password" [(ngModel)]="password" required></ion-input>
         </ion-item>
+        @if (fieldErrors.length) {
+          <ion-text color="danger">
+            @for (fieldError of fieldErrors; track fieldError) {
+              <p>{{ fieldError }}</p>
+            }
+          </ion-text>
+        }
         @if (error) {
           <ion-text color="danger"><p>{{ error }}</p></ion-text>
         }

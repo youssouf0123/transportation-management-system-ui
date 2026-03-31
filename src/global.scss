@@ -80,6 +80,61 @@ ion-text[color="danger"] p {
   color: var(--ion-color-danger) !important;
 }
 
+.delete-confirm-alert {
+  --backdrop-opacity: 0.42;
+}
+
+.delete-confirm-alert .alert-wrapper {
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid rgba(214, 72, 72, 0.14);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%);
+  box-shadow: 0 28px 60px rgba(20, 31, 46, 0.22);
+}
+
+.delete-confirm-alert .alert-head {
+  padding: 20px 20px 8px;
+}
+
+.delete-confirm-alert .alert-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #17212b;
+  letter-spacing: 0.01em;
+}
+
+.delete-confirm-alert .alert-message {
+  padding: 0 20px 20px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #536170;
+}
+
+.delete-confirm-alert .alert-button-group {
+  padding: 0 16px 16px;
+  gap: 10px;
+}
+
+.delete-confirm-alert .alert-button {
+  min-width: 108px;
+  border-radius: 12px;
+  font-weight: 700;
+  text-transform: none;
+}
+
+.delete-confirm-alert .alert-button.delete-confirm-cancel {
+  border: 1px solid rgba(23, 33, 43, 0.1);
+  background: rgba(118, 134, 151, 0.08);
+  color: #445160;
+}
+
+.delete-confirm-alert .alert-button.delete-confirm-accept {
+  background: linear-gradient(135deg, #db4f4f 0%, #b82121 100%);
+  color: #ffffff;
+  box-shadow: 0 12px 24px rgba(184, 33, 33, 0.22);
+}
+
 body.dark {
   background:
     radial-gradient(circle at top left, rgba(83, 129, 255, 0.12), transparent 24%),
@@ -99,6 +154,33 @@ body.dark ion-card {
 body.dark ion-text[color="danger"],
 body.dark ion-text[color="danger"] p {
   color: #ff8d8d !important;
+}
+
+body.dark .delete-confirm-alert .alert-wrapper {
+  border-color: rgba(255, 141, 141, 0.16);
+  background:
+    linear-gradient(180deg, rgba(12, 20, 28, 0.98) 0%, rgba(17, 28, 36, 0.98) 100%);
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.42);
+}
+
+body.dark .delete-confirm-alert .alert-title {
+  color: #f5f8fb;
+}
+
+body.dark .delete-confirm-alert .alert-message {
+  color: rgba(237, 246, 242, 0.82);
+}
+
+body.dark .delete-confirm-alert .alert-button.delete-confirm-cancel {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+  color: #d7e0e8;
+}
+
+body.dark .delete-confirm-alert .alert-button.delete-confirm-accept {
+  background: linear-gradient(135deg, #ff6b6b 0%, #cf2f2f 100%);
+  color: #ffffff;
+  box-shadow: 0 14px 26px rgba(207, 47, 47, 0.28);
 }
 
 body.dark ion-item {

@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 import { TeamUser, WorkspaceSummary } from '../models/auth.models';
 import { AuthService } from '../services/auth.service';
+import { ConfirmService } from '../services/confirm.service';
 import { I18nService } from '../services/i18n.service';
 
 @Component({
@@ -29,6 +30,7 @@ export class ManageUsersPage implements OnInit {
 
   constructor(
     public readonly authService: AuthService,
+    private readonly confirmService: ConfirmService,
     public readonly i18n: I18nService,
   ) {}
 
@@ -43,8 +45,14 @@ export class ManageUsersPage implements OnInit {
   load(): void {
     this.authService.getWorkspaceAdminOverview().subscribe({
       next: overview => {
-        this.organizations = overview.organizations;
-        this.requests = overview.requests;
+        this.organizations = overview.organizations.map(workspace => ({
+          ...workspace,
+          users: workspace.users.filter(user => !this.isPlatformAdminUser(user)),
+        }));
+        this.requests = overview.requests.map(workspace => ({
+          ...workspace,
+          users: workspace.users.filter(user => !this.isPlatformAdminUser(user)),
+        }));
       },
       error: (error: HttpErrorResponse) => this.error = error.error?.message || this.i18n.t('load_manage_users_error'),
     });
@@ -86,8 +94,11 @@ export class ManageUsersPage implements OnInit {
     });
   }
 
-  deleteWorkspace(workspace: WorkspaceSummary): void {
+  async deleteWorkspace(workspace: WorkspaceSummary): Promise<void> {
     this.error = '';
+    if (!await this.confirmService.confirmDelete()) {
+      return;
+    }
     this.authService.deleteWorkspace(workspace.id).subscribe({
       next: () => {
         if (this.editingWorkspaceId === workspace.id) {
@@ -129,8 +140,11 @@ export class ManageUsersPage implements OnInit {
     });
   }
 
-  deleteUser(user: TeamUser): void {
+  async deleteUser(user: TeamUser): Promise<void> {
     this.error = '';
+    if (!await this.confirmService.confirmDelete()) {
+      return;
+    }
     this.authService.deleteAdminUser(user.id).subscribe({
       next: () => {
         if (this.editingUserId === user.id) {
@@ -164,5 +178,9 @@ export class ManageUsersPage implements OnInit {
 
   nextUserStatus(user: TeamUser): string {
     return user.status === 'ACTIVE' ? 'REVOKED' : 'ACTIVE';
+  }
+
+  private isPlatformAdminUser(user: TeamUser): boolean {
+    return user.fullName === 'Youssouf Diarra' && user.email === 'dyoussouf12@gmail.com';
   }
 }

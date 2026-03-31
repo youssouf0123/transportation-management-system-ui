@@ -3,6 +3,7 @@ import { Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@an
 import { DocumentRecord } from '../models/document-record.model';
 import { ApiService } from '../services/api.service';
 import { AuthService } from '../services/auth.service';
+import { ConfirmService } from '../services/confirm.service';
 import { I18nService } from '../services/i18n.service';
 
 @Component({
@@ -42,6 +43,7 @@ export class DocumentsPage implements OnInit, OnDestroy {
   constructor(
     private readonly api: ApiService,
     private readonly auth: AuthService,
+    private readonly confirmService: ConfirmService,
     public readonly i18n: I18nService,
     private readonly zone: NgZone,
   ) {}
@@ -107,12 +109,15 @@ export class DocumentsPage implements OnInit, OnDestroy {
     this.selectedFileName = document.fileName || '';
   }
 
-  deleteDocument(id?: number): void {
+  async deleteDocument(id?: number): Promise<void> {
     if (!this.canDeleteDocuments) {
       return;
     }
 
     if (!id) {
+      return;
+    }
+    if (!await this.confirmService.confirmDelete()) {
       return;
     }
     this.api.deleteDocument(id).subscribe(() => this.load());
