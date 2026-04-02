@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Manage Transportation</string>
+    <string name="title_activity_main">Manage Transportation</string>
+    <string name="package_name">com.managetransportation.app</string>
+    <string name="custom_url_scheme">com.managetransportation.app</string>
+</resources>

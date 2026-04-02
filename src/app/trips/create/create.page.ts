@@ -41,6 +41,38 @@ export class CreatePage implements OnInit {
     this.api.getVehicles().subscribe(vehicles => this.vehicles = vehicles);
   }
 
+  onDriverChange(): void {
+    const driverId = this.trip.driver?.id;
+    if (!driverId) {
+      this.trip.vehicle = null;
+      return;
+    }
+
+    const assignedVehicle = this.vehicles.find(vehicle => vehicle.driver?.id === driverId);
+    this.trip.vehicle = assignedVehicle ?? null;
+  }
+
+  onVehicleChange(): void {
+    const vehicleId = this.trip.vehicle?.id;
+    if (!vehicleId) {
+      this.trip.driver = null;
+      return;
+    }
+
+    const selectedVehicle = this.vehicles.find(vehicle => vehicle.id === vehicleId);
+    const assignedDriverId = selectedVehicle?.driver?.id;
+    this.trip.driver = assignedDriverId
+      ? this.drivers.find(driver => driver.id === assignedDriverId) ?? null
+      : null;
+  }
+
+  compareById(
+    first?: { id?: number } | null,
+    second?: { id?: number } | null,
+  ): boolean {
+    return (first?.id ?? null) === (second?.id ?? null);
+  }
+
   save(): void {
     this.error = '';
     if (!this.trip.origin?.trim()) {

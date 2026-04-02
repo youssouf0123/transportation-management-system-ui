@@ -39,7 +39,11 @@
       <ion-card-header><ion-card-title>{{ i18n.t('workspace_users') }}</ion-card-title></ion-card-header>
       <ion-card-content class="stack">
         @for (user of users; track $index) {
-          <section class="record-card">
+          <section
+            class="record-card"
+            [id]="'user-record-' + user.id"
+            [class.record-card-highlight]="highlightedUserId === user.id"
+          >
             @if (editingUserId === user.id) {
               <div class="stack">
                 <ion-item><ion-label position="stacked">{{ i18n.t('full_name') }}</ion-label><ion-input [(ngModel)]="editDraft.fullName"></ion-input></ion-item>

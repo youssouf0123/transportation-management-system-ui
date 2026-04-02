@@ -38,4 +38,8 @@ export class HomePage {
     });
   }
 
+  statusLabel(status: string, fallback = 'SCHEDULED'): string {
+    return this.i18n.enum('status', status, fallback);
+  }
+
 }

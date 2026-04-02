@@ -40,7 +40,11 @@
       <ion-card-header><ion-card-title>{{ i18n.t('maintenance_tracker') }}</ion-card-title></ion-card-header>
       <ion-card-content class="stack">
         @for (record of records; track $index) {
-          <section class="record-card">
+          <section
+            class="record-card"
+            [id]="'maintenance-record-' + record.id"
+            [class.record-card-highlight]="highlightedRecordId === record.id"
+          >
             @if (editingId === record.id && draft && authService.hasRole('OWNER', 'MANAGER', 'DISPATCHER')) {
               <div class="filter-grid">
                 <ion-item>
@@ -97,6 +101,7 @@
               <h2>{{ record.serviceType }}</h2>
               <p>{{ record.serviceDate }} • {{ i18n.enum('status', record.status, 'SCHEDULED') }}</p>
               <p>{{ i18n.t('entity_vehicle') }}: {{ record.vehicle?.plateNumber || i18n.t('no_vehicle') }}</p>
+              <p>{{ i18n.t('entity_driver') }}: {{ record.vehicle?.driver?.name || i18n.t('unassigned') }}</p>
               <p>{{ i18n.t('cost_label') }}: {{ i18n.formatCurrency(record.cost) }}</p>
               @if (authService.hasRole('OWNER', 'MANAGER', 'DISPATCHER')) {
                 <div class="actions">

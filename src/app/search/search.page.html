@@ -59,7 +59,7 @@
               <h2>{{ item.title }}</h2>
               <p>{{ item.subtitle }}</p>
               <div class="actions">
-                <ion-button size="small" fill="outline" [routerLink]="item.route">{{ i18n.t('open_module') }}</ion-button>
+                <ion-button size="small" fill="outline" [routerLink]="item.route" [queryParams]="item.queryParams">{{ i18n.t('open_module') }}</ion-button>
               </div>
             </section>
           }

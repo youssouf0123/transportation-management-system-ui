@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import { Driver } from '../../models/driver.model';
 import { Trip } from '../../models/trip.model';
@@ -25,11 +26,16 @@ export class ListPage implements OnInit {
     date: '',
   };
   editingId: number | null = null;
+  highlightedTripId: number | null = null;
   draft: Trip | null = null;
   error = '';
 
+  readonly compareById = (first: { id?: number | null } | null, second: { id?: number | null } | null): boolean =>
+    (first?.id ?? null) === (second?.id ?? null);
+
   constructor(
     private readonly api: ApiService,
+    private readonly route: ActivatedRoute,
     private readonly confirmService: ConfirmService,
     public readonly authService: AuthService,
     public readonly i18n: I18nService,
@@ -37,7 +43,11 @@ export class ListPage implements OnInit {
 
   ngOnInit(): void {
     this.loadLookups();
-    this.loadTrips();
+    this.route.queryParamMap.subscribe(params => {
+      const tripId = Number(params.get('tripId'));
+      this.highlightedTripId = Number.isFinite(tripId) && tripId > 0 ? tripId : null;
+      this.loadTrips();
+    });
   }
 
   ionViewWillEnter(): void {
@@ -53,6 +63,7 @@ export class ListPage implements OnInit {
     this.api.getTrips(this.filters).subscribe({
       next: trips => {
         this.trips = trips.map(trip => this.api.normalizeTrip(trip));
+        this.focusHighlightedTrip();
       },
       error: () => {
         this.error = this.i18n.t('load_trips_error');
@@ -64,9 +75,42 @@ export class ListPage implements OnInit {
     this.editingId = trip.id ?? null;
     this.draft = this.api.normalizeTrip({
       ...trip,
-      driver: trip.driver ? { id: trip.driver.id, name: '', licenseNumber: '' } : null,
-      vehicle: trip.vehicle ? { id: trip.vehicle.id, make: '', model: '', plateNumber: '' } : null,
+      driver: trip.driver ? this.drivers.find(driver => driver.id === trip.driver?.id) ?? trip.driver : null,
+      vehicle: trip.vehicle ? this.vehicles.find(vehicle => vehicle.id === trip.vehicle?.id) ?? trip.vehicle : null,
     });
+  }
+
+  onDraftDriverChange(): void {
+    const driverId = this.draft?.driver?.id;
+    if (!this.draft) {
+      return;
+    }
+
+    if (!driverId) {
+      this.draft.vehicle = null;
+      return;
+    }
+
+    const assignedVehicle = this.vehicles.find(vehicle => vehicle.driver?.id === driverId);
+    this.draft.vehicle = assignedVehicle ?? null;
+  }
+
+  onDraftVehicleChange(): void {
+    const vehicleId = this.draft?.vehicle?.id;
+    if (!this.draft) {
+      return;
+    }
+
+    if (!vehicleId) {
+      this.draft.driver = null;
+      return;
+    }
+
+    const selectedVehicle = this.vehicles.find(vehicle => vehicle.id === vehicleId);
+    const assignedDriverId = selectedVehicle?.driver?.id;
+    this.draft.driver = assignedDriverId
+      ? this.drivers.find(driver => driver.id === assignedDriverId) ?? null
+      : null;
   }
 
   saveEdit(): void {
@@ -89,5 +133,16 @@ export class ListPage implements OnInit {
       return;
     }
     this.api.deleteTrip(id).subscribe(() => this.loadTrips());
+  }
+
+  private focusHighlightedTrip(): void {
+    if (!this.highlightedTripId) {
+      return;
+    }
+
+    window.setTimeout(() => {
+      const element = document.getElementById(`trip-record-${this.highlightedTripId}`);
+      element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
   }
 }

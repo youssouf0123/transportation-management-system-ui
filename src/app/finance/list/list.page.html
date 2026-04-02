@@ -63,7 +63,11 @@
         }
 
         @for (record of records; track $index) {
-          <section class="record-card">
+          <section
+            class="record-card"
+            [id]="'finance-record-' + record.id"
+            [class.record-card-highlight]="highlightedRecordId === record.id"
+          >
             @if (editingId === record.id && draft && authService.hasRole('OWNER', 'MANAGER', 'FINANCE')) {
               <div class="filter-grid">
                 <ion-item>

@@ -248,8 +248,13 @@ export class ApiService {
     return this.http.get(`${this.baseUrl}/documents/${id}/file`, { responseType: 'blob' });
   }
 
-  getGlobalSearch(query: string): Observable<SearchResponse> {
-    return this.http.get<SearchResponse>(`${this.baseUrl}/search?q=${encodeURIComponent(query)}`);
+  getGlobalSearch(query: string, lang?: string): Observable<SearchResponse> {
+    const params = new URLSearchParams();
+    params.set('q', query);
+    if (lang) {
+      params.set('lang', lang);
+    }
+    return this.http.get<SearchResponse>(`${this.baseUrl}/search?${params.toString()}`);
   }
 
   toApiDate(value?: string | null): string {

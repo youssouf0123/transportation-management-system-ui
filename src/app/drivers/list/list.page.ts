@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import { Driver } from '../../models/driver.model';
 import { ApiService } from '../../services/api.service';
@@ -19,18 +20,24 @@ export class ListPage implements OnInit {
     status: '',
   };
   editingId: number | null = null;
+  highlightedDriverId: number | null = null;
   draft: Driver | null = null;
   error = '';
 
   constructor(
     private readonly api: ApiService,
+    private readonly route: ActivatedRoute,
     private readonly confirmService: ConfirmService,
     public readonly authService: AuthService,
     public readonly i18n: I18nService,
   ) {}
 
   ngOnInit(): void {
-    this.loadDrivers();
+    this.route.queryParamMap.subscribe(params => {
+      const driverId = Number(params.get('driverId'));
+      this.highlightedDriverId = Number.isFinite(driverId) && driverId > 0 ? driverId : null;
+      this.loadDrivers();
+    });
   }
 
   ionViewWillEnter(): void {
@@ -41,6 +48,7 @@ export class ListPage implements OnInit {
     this.api.getDrivers(this.filters.status, this.filters.search).subscribe({
       next: drivers => {
         this.drivers = drivers;
+        this.focusHighlightedDriver();
         event?.detail.complete();
       },
       error: () => {
@@ -74,5 +82,16 @@ export class ListPage implements OnInit {
       return;
     }
     this.api.deleteDriver(id).subscribe(() => this.loadDrivers());
+  }
+
+  private focusHighlightedDriver(): void {
+    if (!this.highlightedDriverId) {
+      return;
+    }
+
+    window.setTimeout(() => {
+      const element = document.getElementById(`driver-record-${this.highlightedDriverId}`);
+      element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
   }
 }

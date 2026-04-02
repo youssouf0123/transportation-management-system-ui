@@ -47,9 +47,13 @@
           <ion-text color="danger"><p>{{ error }}</p></ion-text>
         }
         @for (log of logs; track $index) {
-          <section class="record-card">
+          <section
+            class="record-card"
+            [id]="'audit-record-' + log.id"
+            [class.record-card-highlight]="highlightedAuditId === log.id"
+          >
             <h2>{{ i18n.enum('entity', log.entityType) }} • {{ i18n.enum('action', log.action) }}</h2>
-            <p>{{ log.description }}</p>
+            <p>{{ localizedDescription(log) }}</p>
             <p>{{ log.actorName }} ({{ i18n.enum('role', log.actorRole) }}) • {{ log.createdAt }}</p>
           </section>
         }

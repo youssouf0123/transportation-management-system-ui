@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'tms-app',
+  appId: 'com.managetransportation.app',
+  appName: 'Manage Transportation',
   webDir: 'www'
 };
 

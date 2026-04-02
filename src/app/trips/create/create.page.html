@@ -33,19 +33,19 @@
       </ion-item>
       <ion-item>
         <ion-label position="stacked">{{ i18n.t('entity_driver') }}</ion-label>
-        <ion-select [(ngModel)]="trip.driver">
+        <ion-select [(ngModel)]="trip.driver" [compareWith]="compareById" (ngModelChange)="onDriverChange()">
           <ion-select-option [value]="null">{{ i18n.t('unassigned') }}</ion-select-option>
           @for (driver of drivers; track $index) {
-            <ion-select-option [value]="{ id: driver.id }">{{ driver.name }}</ion-select-option>
+            <ion-select-option [value]="driver">{{ driver.name }}</ion-select-option>
           }
         </ion-select>
       </ion-item>
       <ion-item>
         <ion-label position="stacked">{{ i18n.t('entity_vehicle') }}</ion-label>
-        <ion-select [(ngModel)]="trip.vehicle">
+        <ion-select [(ngModel)]="trip.vehicle" [compareWith]="compareById" (ngModelChange)="onVehicleChange()">
           <ion-select-option [value]="null">{{ i18n.t('unassigned') }}</ion-select-option>
           @for (vehicle of vehicles; track $index) {
-            <ion-select-option [value]="{ id: vehicle.id }">{{ vehicle.plateNumber }}</ion-select-option>
+            <ion-select-option [value]="vehicle">{{ vehicle.plateNumber }}</ion-select-option>
           }
         </ion-select>
       </ion-item>

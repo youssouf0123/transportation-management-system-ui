@@ -4,6 +4,7 @@ export interface SearchItem {
   title: string;
   subtitle: string;
   route: string;
+  queryParams?: Record<string, string | number>;
 }
 
 export interface SearchSection {

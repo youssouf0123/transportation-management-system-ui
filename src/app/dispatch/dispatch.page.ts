@@ -33,4 +33,11 @@ export class DispatchPage implements OnInit {
       error: () => this.error = this.i18n.t('load_dispatch_error'),
     });
   }
+
+  clearFocusedCard(event: Event): void {
+    const target = event.currentTarget;
+    if (target instanceof HTMLElement) {
+      target.blur();
+    }
+  }
 }

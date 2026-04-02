@@ -19,6 +19,7 @@
   padding: 16px;
   border-radius: 20px;
   background: rgba(246, 250, 255, 0.9);
+  scroll-margin-top: 96px;
 }
 
 .record-card h2,
@@ -26,8 +27,18 @@
   margin: 0 0 8px;
 }
 
+.record-card-highlight {
+  border: 2px solid rgba(31, 87, 212, 0.35);
+  box-shadow: 0 18px 40px rgba(31, 87, 212, 0.14);
+}
+
 .actions {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+:host-context(body.dark) .record-card-highlight {
+  border-color: rgba(120, 177, 255, 0.45);
+  box-shadow: 0 18px 40px rgba(4, 18, 36, 0.45);
 }

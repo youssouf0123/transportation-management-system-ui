@@ -46,7 +46,11 @@
         }
 
         @for (driver of drivers; track $index) {
-          <section class="record-card">
+          <section
+            class="record-card"
+            [id]="'driver-record-' + driver.id"
+            [class.record-card-highlight]="highlightedDriverId === driver.id"
+          >
             @if (editingId === driver.id && draft && authService.hasRole('OWNER', 'MANAGER', 'DISPATCHER')) {
               <div class="filter-grid">
                 <ion-item>

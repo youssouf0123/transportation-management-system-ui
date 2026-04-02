@@ -1,4 +1,5 @@
 import { Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import { DocumentRecord } from '../models/document-record.model';
 import { ApiService } from '../services/api.service';
@@ -33,6 +34,7 @@ export class DocumentsPage implements OnInit, OnDestroy {
     expiryDate: '',
   };
   editingId: number | null = null;
+  highlightedDocumentId: number | null = null;
   selectedFile: File | null = null;
   selectedFileName = '';
   error = '';
@@ -42,6 +44,7 @@ export class DocumentsPage implements OnInit, OnDestroy {
 
   constructor(
     private readonly api: ApiService,
+    private readonly route: ActivatedRoute,
     private readonly auth: AuthService,
     private readonly confirmService: ConfirmService,
     public readonly i18n: I18nService,
@@ -57,7 +60,11 @@ export class DocumentsPage implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.load();
+    this.route.queryParamMap.subscribe(params => {
+      const documentId = Number(params.get('documentId'));
+      this.highlightedDocumentId = Number.isFinite(documentId) && documentId > 0 ? documentId : null;
+      this.load();
+    });
   }
 
   ngOnDestroy(): void {
@@ -70,7 +77,10 @@ export class DocumentsPage implements OnInit, OnDestroy {
 
   load(): void {
     this.api.getDocuments(this.filters).subscribe({
-      next: documents => this.documents = documents.map(document => this.api.normalizeDocument(document)),
+      next: documents => {
+        this.documents = documents.map(document => this.api.normalizeDocument(document));
+        this.focusHighlightedDocument();
+      },
       error: () => this.error = this.i18n.t('load_documents_error'),
     });
   }
@@ -263,6 +273,17 @@ export class DocumentsPage implements OnInit, OnDestroy {
         this.selectedFileName = this.selectedFile.name;
       });
     }, 'image/jpeg', 0.92);
+  }
+
+  private focusHighlightedDocument(): void {
+    if (!this.highlightedDocumentId) {
+      return;
+    }
+
+    window.setTimeout(() => {
+      const element = document.getElementById(`document-record-${this.highlightedDocumentId}`);
+      element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
   }
 
   private stopCamera(): void {

@@ -54,7 +54,11 @@
         }
 
         @for (vehicle of vehicles; track $index) {
-          <section class="record-card">
+          <section
+            class="record-card"
+            [id]="'vehicle-record-' + vehicle.id"
+            [class.record-card-highlight]="highlightedVehicleId === vehicle.id"
+          >
             @if (editingId === vehicle.id && draft && authService.hasRole('OWNER', 'MANAGER', 'DISPATCHER')) {
               <div class="filter-grid">
                 <ion-item>

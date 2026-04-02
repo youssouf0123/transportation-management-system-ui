@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import { Driver } from '../../models/driver.model';
 import { MaintenanceRecord } from '../../models/maintenance-record.model';
@@ -28,18 +29,25 @@ export class ListPage implements OnInit {
   selectedVehicle: Vehicle | null = null;
   draft: MaintenanceRecord | null = null;
   error = '';
+  highlightedRecordId: number | null = null;
 
   constructor(
     private readonly api: ApiService,
+    private readonly route: ActivatedRoute,
     private readonly confirmService: ConfirmService,
     public readonly authService: AuthService,
     public readonly i18n: I18nService,
   ) {}
 
   ngOnInit(): void {
+    this.route.queryParamMap.subscribe(params => {
+      const recordId = Number(params.get('recordId'));
+      this.highlightedRecordId = Number.isFinite(recordId) && recordId > 0 ? recordId : null;
+      this.loadRecords();
+    });
+
     this.api.getDrivers().subscribe(drivers => this.drivers = drivers);
     this.api.getVehicles().subscribe(vehicles => this.vehicles = vehicles);
-    this.loadRecords();
   }
 
   ionViewWillEnter(): void {
@@ -48,9 +56,23 @@ export class ListPage implements OnInit {
 
   loadRecords(): void {
     this.api.getMaintenanceRecords(this.filters).subscribe({
-      next: records => this.records = records.map(record => this.api.normalizeMaintenanceRecord(record)),
+      next: records => {
+        this.records = records.map(record => this.api.normalizeMaintenanceRecord(record));
+        this.focusHighlightedRecord();
+      },
       error: () => this.error = this.i18n.t('load_maintenance_error')
     });
+  }
+
+  private focusHighlightedRecord(): void {
+    if (!this.highlightedRecordId) {
+      return;
+    }
+
+    setTimeout(() => {
+      const element = document.getElementById(`maintenance-record-${this.highlightedRecordId}`);
+      element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 50);
   }
 
   startEdit(record: MaintenanceRecord): void {

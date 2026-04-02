@@ -25,12 +25,17 @@
           <ion-card-header><ion-card-title>{{ i18n.t('unassigned_trips') }}</ion-card-title></ion-card-header>
           <ion-card-content class="stack">
             @for (trip of board.unassignedTrips; track $index) {
-              <section class="record-card">
+              <a
+                class="record-card dispatch-link"
+                [routerLink]="'/trips/list'"
+                [queryParams]="{ tripId: trip.id }"
+                (click)="clearFocusedCard($event)"
+              >
                 <strong>{{ trip.origin }} to {{ trip.destination }}</strong>
                 <p>{{ trip.scheduledDate }} • {{ i18n.enum('status', trip.status, 'PLANNED') }}</p>
                 <p>{{ i18n.t('entity_driver') }}: {{ trip.driver?.name || i18n.t('unassigned') }}</p>
                 <p>{{ i18n.t('entity_vehicle') }}: {{ trip.vehicle?.plateNumber || i18n.t('unassigned') }}</p>
-              </section>
+              </a>
             }
           </ion-card-content>
         </ion-card>
@@ -39,16 +44,27 @@
           <ion-card-header><ion-card-title>{{ i18n.t('ready_drivers_vehicles') }}</ion-card-title></ion-card-header>
           <ion-card-content class="stack">
             @for (driver of board.availableDrivers; track $index) {
-              <section class="record-card compact-card">
+              <a
+                class="record-card compact-card dispatch-link"
+                [routerLink]="'/drivers/list'"
+                [queryParams]="{ driverId: driver.id }"
+                (click)="clearFocusedCard($event)"
+              >
                 <strong>{{ driver.name }}</strong>
                 <p>{{ driver.licenseNumber }} • {{ i18n.enum('status', driver.status, 'AVAILABLE') }}</p>
-              </section>
+              </a>
             }
             @for (vehicle of board.availableVehicles; track $index) {
-              <section class="record-card compact-card">
+              <a
+                class="record-card compact-card dispatch-link"
+                [routerLink]="'/vehicles/list'"
+                [queryParams]="{ vehicleId: vehicle.id }"
+                (click)="clearFocusedCard($event)"
+              >
                 <strong>{{ vehicle.plateNumber }}</strong>
                 <p>{{ vehicle.make }} {{ vehicle.model }} • {{ i18n.enum('status', vehicle.status, 'ACTIVE') }}</p>
-              </section>
+                <p>{{ i18n.t('entity_driver') }}: {{ vehicle.driver?.name || i18n.t('unassigned') }}</p>
+              </a>
             }
           </ion-card-content>
         </ion-card>
@@ -57,16 +73,28 @@
           <ion-card-header><ion-card-title>{{ i18n.t('active_trips_maintenance_alerts') }}</ion-card-title></ion-card-header>
           <ion-card-content class="stack">
             @for (trip of board.activeTrips; track $index) {
-              <section class="record-card compact-card">
+              <a
+                class="record-card compact-card dispatch-link"
+                [routerLink]="'/trips/list'"
+                [queryParams]="{ tripId: trip.id }"
+                (click)="clearFocusedCard($event)"
+              >
                 <strong>{{ trip.origin }} to {{ trip.destination }}</strong>
                 <p>{{ trip.scheduledDate }} • {{ i18n.enum('status', trip.status, 'PLANNED') }}</p>
-              </section>
+                <p>{{ i18n.t('entity_driver') }}: {{ trip.driver?.name || i18n.t('unassigned') }}</p>
+              </a>
             }
             @for (record of board.maintenanceAlerts; track $index) {
-              <section class="record-card compact-card alert-card">
+              <a
+                class="record-card compact-card alert-card dispatch-link"
+                [routerLink]="'/maintenance/list'"
+                [queryParams]="{ recordId: record.id }"
+                (click)="clearFocusedCard($event)"
+              >
                 <strong>{{ record.serviceType }}</strong>
                 <p>{{ record.vehicle?.plateNumber || i18n.t('no_vehicle') }} • {{ record.serviceDate }}</p>
-              </section>
+                <p>{{ i18n.t('entity_driver') }}: {{ record.vehicle?.driver?.name || i18n.t('unassigned') }}</p>
+              </a>
             }
           </ion-card-content>
         </ion-card>

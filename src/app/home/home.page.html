@@ -104,10 +104,15 @@
         </ion-card-header>
         <ion-card-content>
           @for (trip of summary.recentTrips; track $index) {
-            <div class="summary-row">
+            <a
+              class="summary-row summary-link"
+              [routerLink]="'/trips/list'"
+              [queryParams]="{ tripId: trip.id }"
+            >
               <strong>{{ trip.origin }} to {{ trip.destination }}</strong>
-              <span>{{ trip.scheduledDate }} • {{ trip.status }}</span>
-            </div>
+              <span>{{ i18n.t('entity_driver') }}: {{ trip.driver?.name || i18n.t('unassigned') }}</span>
+              <span>{{ trip.scheduledDate }} • {{ statusLabel(trip.status, 'PLANNED') }}</span>
+            </a>
           }
         </ion-card-content>
       </ion-card>
@@ -118,10 +123,15 @@
         </ion-card-header>
         <ion-card-content>
           @for (record of summary.recentMaintenance; track $index) {
-            <div class="summary-row">
+            <a
+              class="summary-row summary-link"
+              [routerLink]="'/maintenance/list'"
+              [queryParams]="{ recordId: record.id }"
+            >
               <strong>{{ record.serviceType }}</strong>
-              <span>{{ record.serviceDate }} • {{ record.status }}</span>
-            </div>
+              <span>{{ i18n.t('entity_driver') }}: {{ record.vehicle?.driver?.name || i18n.t('unassigned') }}</span>
+              <span>{{ record.serviceDate }} • {{ statusLabel(record.status, 'SCHEDULED') }}</span>
+            </a>
           }
         </ion-card-content>
       </ion-card>

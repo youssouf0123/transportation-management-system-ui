@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import { Driver } from '../../models/driver.model';
 import { FinanceRecord } from '../../models/finance-record.model';
@@ -28,6 +29,7 @@ export class ListPage implements OnInit {
     end: '',
   };
   editingId: number | null = null;
+  highlightedRecordId: number | null = null;
   driverId: number | null = null;
   selectedVehicle: Vehicle | null = null;
   draft: FinanceRecord | null = null;
@@ -35,6 +37,7 @@ export class ListPage implements OnInit {
 
   constructor(
     private readonly api: ApiService,
+    private readonly route: ActivatedRoute,
     private readonly confirmService: ConfirmService,
     public readonly authService: AuthService,
     public readonly i18n: I18nService,
@@ -43,7 +46,11 @@ export class ListPage implements OnInit {
   ngOnInit(): void {
     this.api.getDrivers().subscribe(drivers => this.drivers = drivers);
     this.api.getVehicles().subscribe(vehicles => this.vehicles = vehicles);
-    this.load();
+    this.route.queryParamMap.subscribe(params => {
+      const recordId = Number(params.get('recordId'));
+      this.highlightedRecordId = Number.isFinite(recordId) && recordId > 0 ? recordId : null;
+      this.load();
+    });
   }
 
   ionViewWillEnter(): void {
@@ -59,7 +66,10 @@ export class ListPage implements OnInit {
     };
 
     this.api.getFinanceRecords(payload).subscribe({
-      next: records => this.records = records.map(record => this.api.normalizeFinanceRecord(record)),
+      next: records => {
+        this.records = records.map(record => this.api.normalizeFinanceRecord(record));
+        this.focusHighlightedRecord();
+      },
       error: () => this.error = this.i18n.t('load_finance_error'),
     });
   }
@@ -156,5 +166,16 @@ export class ListPage implements OnInit {
     }
 
     return record.descriptionEn || record.description || record.descriptionFr || '';
+  }
+
+  private focusHighlightedRecord(): void {
+    if (!this.highlightedRecordId) {
+      return;
+    }
+
+    window.setTimeout(() => {
+      const element = document.getElementById(`finance-record-${this.highlightedRecordId}`);
+      element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
   }
 }

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import { Driver } from '../../models/driver.model';
 import { Vehicle } from '../../models/vehicle.model';
@@ -22,11 +23,13 @@ export class ListPage implements OnInit {
     driverId: null as number | null,
   };
   editingId: number | null = null;
+  highlightedVehicleId: number | null = null;
   draft: Vehicle | null = null;
   error = '';
 
   constructor(
     private readonly api: ApiService,
+    private readonly route: ActivatedRoute,
     private readonly confirmService: ConfirmService,
     public readonly authService: AuthService,
     public readonly i18n: I18nService,
@@ -37,7 +40,11 @@ export class ListPage implements OnInit {
 
   ngOnInit(): void {
     this.api.getDrivers().subscribe(drivers => this.drivers = drivers);
-    this.loadVehicles();
+    this.route.queryParamMap.subscribe(params => {
+      const vehicleId = Number(params.get('vehicleId'));
+      this.highlightedVehicleId = Number.isFinite(vehicleId) && vehicleId > 0 ? vehicleId : null;
+      this.loadVehicles();
+    });
   }
 
   ionViewWillEnter(): void {
@@ -48,6 +55,7 @@ export class ListPage implements OnInit {
     this.api.getVehicles(this.filters.status, this.filters.search, this.filters.driverId).subscribe({
       next: vehicles => {
         this.vehicles = vehicles;
+        this.focusHighlightedVehicle();
         event?.detail.complete();
       },
       error: () => {
@@ -84,5 +92,16 @@ export class ListPage implements OnInit {
       return;
     }
     this.api.deleteVehicle(id).subscribe(() => this.loadVehicles());
+  }
+
+  private focusHighlightedVehicle(): void {
+    if (!this.highlightedVehicleId) {
+      return;
+    }
+
+    window.setTimeout(() => {
+      const element = document.getElementById(`vehicle-record-${this.highlightedVehicleId}`);
+      element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
   }
 }

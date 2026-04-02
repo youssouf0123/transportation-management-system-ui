@@ -136,7 +136,11 @@
           <ion-text color="danger"><p>{{ error }}</p></ion-text>
         }
         @for (document of documents; track $index) {
-          <section class="record-card">
+          <section
+            class="record-card"
+            [id]="'document-record-' + document.id"
+            [class.record-card-highlight]="highlightedDocumentId === document.id"
+          >
             <h2>{{ document.title }}</h2>
             <p>{{ i18n.enum('document', document.documentType) }} • {{ i18n.enum('entity', document.entityType) }} #{{ document.entityId || 'N/A' }}</p>
             <p>{{ i18n.t('status') }}: {{ i18n.enum('status', document.status, 'ACTIVE') }} • {{ i18n.t('expiry_date') }}: {{ document.expiryDate || i18n.t('none') }}</p>

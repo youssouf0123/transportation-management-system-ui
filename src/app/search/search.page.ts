@@ -59,7 +59,7 @@ export class SearchPage implements OnInit {
 
     this.searching = true;
     this.error = '';
-    this.api.getGlobalSearch(trimmed).subscribe({
+    this.api.getGlobalSearch(trimmed, this.i18n.currentLanguage).subscribe({
       next: (response) => {
         this.results = response;
         this.searching = false;
