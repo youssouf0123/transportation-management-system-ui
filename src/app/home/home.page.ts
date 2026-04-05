@@ -1,8 +1,9 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-import { Subscription, filter } from 'rxjs';
+import { Subscription, filter, forkJoin } from 'rxjs';
 
 import { DashboardSummary } from '../models/dashboard-summary.model';
+import { FinanceRecord } from '../models/finance-record.model';
 import { ApiService } from '../services/api.service';
 import { I18nService } from '../services/i18n.service';
 
@@ -51,14 +52,52 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   loadSummary(): void {
-    this.api.getDashboardSummary().subscribe({
-      next: summary => {
-        this.summary = summary;
+    const { start, end } = this.currentMonthRange();
+
+    forkJoin({
+      summary: this.api.getDashboardSummary(),
+      financeRecords: this.api.getFinanceRecords({ start, end }),
+    }).subscribe({
+      next: ({ summary, financeRecords }) => {
+        this.summary = financeRecords.length
+          ? {
+              ...summary,
+              ...this.calculateMonthlyNet(financeRecords),
+            }
+          : summary;
       },
       error: () => {
         this.error = this.i18n.t('dashboard_load_error');
       }
     });
+  }
+
+  private calculateMonthlyNet(records: FinanceRecord[]): Pick<DashboardSummary, 'earnings' | 'expenses' | 'net'> {
+    const earnings = records
+      .filter(record => record.type?.toUpperCase() === 'EARNING')
+      .reduce((sum, record) => sum + (record.amount || 0), 0);
+
+    const expenses = records
+      .filter(record => record.type?.toUpperCase() === 'EXPENSE')
+      .reduce((sum, record) => sum + (record.amount || 0), 0);
+
+    return {
+      earnings,
+      expenses,
+      net: earnings - expenses,
+    };
+  }
+
+  private currentMonthRange(): { start: string; end: string } {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+
+    return {
+      start: `${year}-${month}-01`,
+      end: `${year}-${month}-${day}`,
+    };
   }
 
   statusLabel(status: string, fallback = 'SCHEDULED'): string {
