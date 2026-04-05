@@ -99,6 +99,7 @@ export class ApiService {
   getFinanceRecords(filters: {
     vehicleId?: number | null;
     driverId?: number | null;
+    category?: string;
     type?: string;
     scope?: string;
     date?: string;
@@ -108,6 +109,7 @@ export class ApiService {
     const query = new URLSearchParams();
     if (filters.vehicleId) query.set('vehicleId', String(filters.vehicleId));
     if (filters.driverId) query.set('driverId', String(filters.driverId));
+    if (filters.category) query.set('category', filters.category);
     if (filters.type) query.set('type', filters.type);
     if (filters.scope) query.set('scope', filters.scope);
     if (filters.date) query.set('date', this.toApiDate(filters.date));

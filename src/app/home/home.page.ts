@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { Subscription, filter } from 'rxjs';
 
 import { DashboardSummary } from '../models/dashboard-summary.model';
 import { ApiService } from '../services/api.service';
@@ -10,16 +12,37 @@ import { I18nService } from '../services/i18n.service';
   styleUrls: ['home.page.scss'],
   standalone: false,
 })
-export class HomePage {
+export class HomePage implements OnInit, OnDestroy {
   summary: DashboardSummary | null = null;
   error = '';
+  private languageSubscription?: Subscription;
+  private routeSubscription?: Subscription;
 
   constructor(
     private readonly api: ApiService,
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly router: Router,
     public readonly i18n: I18nService,
   ) {}
 
   ngOnInit(): void {
+    this.languageSubscription = this.i18n.language$.subscribe(() => {
+      if (this.router.url.startsWith('/home')) {
+        this.loadSummary();
+        return;
+      }
+
+      queueMicrotask(() => this.changeDetectorRef.markForCheck());
+    });
+
+    this.routeSubscription = this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe(event => {
+        if (event.urlAfterRedirects.startsWith('/home')) {
+          this.loadSummary();
+        }
+      });
+
     this.loadSummary();
   }
 
@@ -40,6 +63,11 @@ export class HomePage {
 
   statusLabel(status: string, fallback = 'SCHEDULED'): string {
     return this.i18n.enum('status', status, fallback);
+  }
+
+  ngOnDestroy(): void {
+    this.languageSubscription?.unsubscribe();
+    this.routeSubscription?.unsubscribe();
   }
 
 }

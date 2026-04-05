@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import { Driver } from '../../models/driver.model';
 import { FinanceRecord } from '../../models/finance-record.model';
@@ -15,15 +16,17 @@ import { I18nService } from '../../services/i18n.service';
   styleUrls: ['./list.page.scss'],
   standalone: false,
 })
-export class ListPage implements OnInit {
+export class ListPage implements OnInit, OnDestroy {
   records: FinanceRecord[] = [];
   drivers: Driver[] = [];
   vehicles: Vehicle[] = [];
+  readonly miscCategories = ['FAMILY_EXPENSE', 'PERSONAL', 'OTHER', 'HOUSEHOLD'];
   filterMode: 'date' | 'range' = 'date';
   filters = {
-    driverId: null as number | null,
-    type: '',
     scope: '',
+    driverId: null as number | null,
+    category: '',
+    type: '',
     date: '',
     start: '',
     end: '',
@@ -34,16 +37,21 @@ export class ListPage implements OnInit {
   selectedVehicle: Vehicle | null = null;
   draft: FinanceRecord | null = null;
   error = '';
+  private languageSubscription?: Subscription;
 
   constructor(
     private readonly api: ApiService,
     private readonly route: ActivatedRoute,
+    private readonly changeDetectorRef: ChangeDetectorRef,
     private readonly confirmService: ConfirmService,
     public readonly authService: AuthService,
     public readonly i18n: I18nService,
   ) {}
 
   ngOnInit(): void {
+    this.languageSubscription = this.i18n.language$.subscribe(() => {
+      queueMicrotask(() => this.changeDetectorRef.markForCheck());
+    });
     this.api.getDrivers().subscribe(drivers => this.drivers = drivers);
     this.api.getVehicles().subscribe(vehicles => this.vehicles = vehicles);
     this.route.queryParamMap.subscribe(params => {
@@ -57,9 +65,15 @@ export class ListPage implements OnInit {
     this.load();
   }
 
+  ngOnDestroy(): void {
+    this.languageSubscription?.unsubscribe();
+  }
+
   load(): void {
     const payload = {
       ...this.filters,
+      driverId: this.filters.scope === 'VEHICLE' ? this.filters.driverId : null,
+      category: this.filters.scope === 'MISC' ? this.filters.category : '',
       date: this.filterMode === 'date' ? this.filters.date : '',
       start: this.filterMode === 'range' ? this.filters.start : '',
       end: this.filterMode === 'range' ? this.filters.end : '',
@@ -67,7 +81,8 @@ export class ListPage implements OnInit {
 
     this.api.getFinanceRecords(payload).subscribe({
       next: records => {
-        this.records = records.map(record => this.api.normalizeFinanceRecord(record));
+        const normalizedRecords = records.map(record => this.api.normalizeFinanceRecord(record));
+        this.records = this.applyClientFilters(normalizedRecords, payload);
         this.focusHighlightedRecord();
       },
       error: () => this.error = this.i18n.t('load_finance_error'),
@@ -82,6 +97,50 @@ export class ListPage implements OnInit {
     }
 
     this.filters.date = '';
+  }
+
+  onScopeChange(): void {
+    this.filters.driverId = null;
+    this.filters.category = '';
+  }
+
+  secondaryFilterLabel(): string {
+    if (this.filters.scope === 'MISC') {
+      return this.i18n.t('miscellaneous');
+    }
+
+    if (!this.filters.scope) {
+      return `${this.i18n.t('entity_driver')}/${this.i18n.t('miscellaneous')}`;
+    }
+
+    return this.i18n.t('entity_driver');
+  }
+
+  scopeSelectedText(): string {
+    return this.filters.scope ? this.i18n.enum('scope', this.filters.scope) : this.i18n.t('all');
+  }
+
+  secondarySelectedText(): string {
+    if (this.filters.scope === 'VEHICLE') {
+      if (!this.filters.driverId) {
+        return this.i18n.t('all');
+      }
+      return this.drivers.find(driver => driver.id === this.filters.driverId)?.name || this.i18n.t('all');
+    }
+
+    if (this.filters.scope === 'MISC') {
+      return this.filters.category ? this.i18n.enum('category', this.filters.category) : this.i18n.t('all');
+    }
+
+    return this.i18n.t('all');
+  }
+
+  typeSelectedText(): string {
+    return this.filters.type ? this.i18n.enum('status', this.filters.type) : this.i18n.t('all');
+  }
+
+  filterModeSelectedText(): string {
+    return this.filterMode === 'range' ? this.i18n.t('date_range') : this.i18n.t('single_date');
   }
 
   startEdit(record: FinanceRecord): void {
@@ -166,6 +225,34 @@ export class ListPage implements OnInit {
     }
 
     return record.descriptionEn || record.description || record.descriptionFr || '';
+  }
+
+  private applyClientFilters(records: FinanceRecord[], payload: typeof this.filters & {
+    driverId: number | null;
+    category: string;
+    date: string;
+    start: string;
+    end: string;
+  }): FinanceRecord[] {
+    return records.filter(record => {
+      if (payload.scope && payload.scope.toUpperCase() !== (record.recordScope || '').toUpperCase()) {
+        return false;
+      }
+
+      if (payload.scope === 'VEHICLE' && payload.driverId && record.vehicle?.driver?.id !== payload.driverId) {
+        return false;
+      }
+
+      if (payload.scope === 'MISC' && payload.category && payload.category.toUpperCase() !== (record.category || '').toUpperCase()) {
+        return false;
+      }
+
+      if (payload.type && payload.type.toUpperCase() !== (record.type || '').toUpperCase()) {
+        return false;
+      }
+
+      return true;
+    });
   }
 
   private focusHighlightedRecord(): void {

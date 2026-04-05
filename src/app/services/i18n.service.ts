@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
 type Language = 'en' | 'fr';
 
@@ -8,6 +9,8 @@ type Language = 'en' | 'fr';
 export class I18nService {
   private readonly storageKey = 'tms_language';
   private language: Language = 'en';
+  private readonly languageSubject = new BehaviorSubject<Language>(this.language);
+  readonly language$ = this.languageSubject.asObservable();
 
   private readonly dictionary: Record<Language, Record<string, string>> = {
     en: {
@@ -649,6 +652,7 @@ export class I18nService {
     if (saved === 'en' || saved === 'fr') {
       this.language = saved;
     }
+    this.languageSubject.next(this.language);
   }
 
   get currentLanguage(): Language {
@@ -658,6 +662,7 @@ export class I18nService {
   setLanguage(language: Language): void {
     this.language = language;
     localStorage.setItem(this.storageKey, language);
+    this.languageSubject.next(language);
   }
 
   t(key: string): string {

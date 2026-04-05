@@ -13,33 +13,46 @@
       <ion-card-header><ion-card-title>{{ i18n.t('finance_filters') }}</ion-card-title></ion-card-header>
       <ion-card-content class="filter-grid">
         <ion-item>
-          <ion-label position="stacked">{{ i18n.t('entity_driver') }}</ion-label>
-          <ion-select [(ngModel)]="filters.driverId">
-            <ion-select-option [value]="null">{{ i18n.t('all') }}</ion-select-option>
-            @for (driver of drivers; track $index) {
-              <ion-select-option [value]="driver.id">{{ driver.name }}</ion-select-option>
-            }
-          </ion-select>
-        </ion-item>
-        <ion-item>
-          <ion-label position="stacked">{{ i18n.t('type') }}</ion-label>
-          <ion-select [(ngModel)]="filters.type">
-            <ion-select-option value="">{{ i18n.t('all') }}</ion-select-option>
-            <ion-select-option value="EARNING">{{ i18n.enum('status', 'EARNING') }}</ion-select-option>
-            <ion-select-option value="EXPENSE">{{ i18n.enum('status', 'EXPENSE') }}</ion-select-option>
-          </ion-select>
-        </ion-item>
-        <ion-item>
           <ion-label position="stacked">{{ i18n.t('scope') }}</ion-label>
-          <ion-select [(ngModel)]="filters.scope">
+          <ion-select [(ngModel)]="filters.scope" [selectedText]="scopeSelectedText()" (ionChange)="onScopeChange()">
             <ion-select-option value="">{{ i18n.t('all') }}</ion-select-option>
             <ion-select-option value="VEHICLE">{{ i18n.enum('scope', 'VEHICLE') }}</ion-select-option>
             <ion-select-option value="MISC">{{ i18n.enum('scope', 'MISC') }}</ion-select-option>
           </ion-select>
         </ion-item>
         <ion-item>
+          <ion-label position="stacked">{{ secondaryFilterLabel() }}</ion-label>
+          @if (filters.scope === 'VEHICLE') {
+            <ion-select [(ngModel)]="filters.driverId" [selectedText]="secondarySelectedText()">
+              <ion-select-option [value]="null">{{ i18n.t('all') }}</ion-select-option>
+              @for (driver of drivers; track $index) {
+                <ion-select-option [value]="driver.id">{{ driver.name }}</ion-select-option>
+              }
+            </ion-select>
+          } @else if (filters.scope === 'MISC') {
+            <ion-select [(ngModel)]="filters.category" [selectedText]="secondarySelectedText()">
+              <ion-select-option value="">{{ i18n.t('all') }}</ion-select-option>
+              @for (category of miscCategories; track $index) {
+                <ion-select-option [value]="category">{{ i18n.enum('category', category) }}</ion-select-option>
+              }
+            </ion-select>
+          } @else {
+            <ion-select [value]="''" [selectedText]="secondarySelectedText()" [disabled]="true" interface="popover">
+              <ion-select-option value="">{{ i18n.t('all') }}</ion-select-option>
+            </ion-select>
+          }
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">{{ i18n.t('type') }}</ion-label>
+          <ion-select [(ngModel)]="filters.type" [selectedText]="typeSelectedText()">
+            <ion-select-option value="">{{ i18n.t('all') }}</ion-select-option>
+            <ion-select-option value="EARNING">{{ i18n.enum('status', 'EARNING') }}</ion-select-option>
+            <ion-select-option value="EXPENSE">{{ i18n.enum('status', 'EXPENSE') }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
           <ion-label position="stacked">{{ i18n.t('filter_mode') }}</ion-label>
-          <ion-select [(ngModel)]="filterMode" (ionChange)="onFilterModeChange()">
+          <ion-select [(ngModel)]="filterMode" [selectedText]="filterModeSelectedText()" (ionChange)="onFilterModeChange()">
             <ion-select-option value="date">{{ i18n.t('single_date') }}</ion-select-option>
             <ion-select-option value="range">{{ i18n.t('date_range') }}</ion-select-option>
           </ion-select>
@@ -83,7 +96,11 @@
                 </ion-item>
                 <ion-item>
                   <ion-label position="stacked">{{ i18n.t('category') }}</ion-label>
-                  <ion-input [(ngModel)]="draft.category"></ion-input>
+                  <ion-select [(ngModel)]="draft.category">
+                    @for (category of miscCategories; track $index) {
+                      <ion-select-option [value]="category">{{ i18n.enum('category', category) }}</ion-select-option>
+                    }
+                  </ion-select>
                 </ion-item>
                 <ion-item>
                   <ion-label position="stacked">{{ i18n.t('amount') }}</ion-label>
