@@ -52,19 +52,15 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   loadSummary(): void {
-    const { start, end } = this.currentMonthRange();
-
     forkJoin({
       summary: this.api.getDashboardSummary(),
-      financeRecords: this.api.getFinanceRecords({ start, end }),
+      financeRecords: this.api.getFinanceRecords({}),
     }).subscribe({
       next: ({ summary, financeRecords }) => {
-        this.summary = financeRecords.length
-          ? {
-              ...summary,
-              ...this.calculateMonthlyNet(financeRecords),
-            }
-          : summary;
+        this.summary = {
+          ...summary,
+          ...this.calculateMonthlyNet(financeRecords),
+        };
       },
       error: () => {
         this.error = this.i18n.t('dashboard_load_error');
@@ -73,11 +69,13 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   private calculateMonthlyNet(records: FinanceRecord[]): Pick<DashboardSummary, 'earnings' | 'expenses' | 'net'> {
-    const earnings = records
+    const currentMonthRecords = records.filter(record => this.isInCurrentMonth(record.date));
+
+    const earnings = currentMonthRecords
       .filter(record => record.type?.toUpperCase() === 'EARNING')
       .reduce((sum, record) => sum + (record.amount || 0), 0);
 
-    const expenses = records
+    const expenses = currentMonthRecords
       .filter(record => record.type?.toUpperCase() === 'EXPENSE')
       .reduce((sum, record) => sum + (record.amount || 0), 0);
 
@@ -88,16 +86,18 @@ export class HomePage implements OnInit, OnDestroy {
     };
   }
 
-  private currentMonthRange(): { start: string; end: string } {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
+  private isInCurrentMonth(dateValue?: string): boolean {
+    if (!dateValue) {
+      return false;
+    }
 
-    return {
-      start: `${year}-${month}-01`,
-      end: `${year}-${month}-${day}`,
-    };
+    const date = new Date(`${dateValue}T00:00:00`);
+    if (Number.isNaN(date.getTime())) {
+      return false;
+    }
+
+    const now = new Date();
+    return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth();
   }
 
   statusLabel(status: string, fallback = 'SCHEDULED'): string {
